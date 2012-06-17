@@ -1,0 +1,78 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 21 60 474 316
+
+/Outterbox
+{ newpath moveto
+0 249 rlineto
+128 0 rlineto
+23 61 moveto
+450 0 rlineto
+0 249 rlineto
+-155 0 rlineto
+23 87 moveto
+450 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+425 0 rlineto
+0 118 rlineto
+-425 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 13 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+34 100 Innerbox
+
+155 306 TitleFont(MOUSE CONFIGURATION) show
+
+34 294 PanelFont (This part of the configuration process will create a /dev/mouse link) show
+34 280 PanelFont (pointing to your default mouse device.  You can change the /dev/mouse) show
+34 266 PanelFont (link later if the mouse doesn't work, or if you switch to a different) show
+34 252 PanelFont (type of pointing device.  We will also use the information about the) show
+34 238 PanelFont (mouse to set the correct protocol for gpm, the Linux mouse server.) show
+34 224 PanelFont (Please select a mouse type from the list below:) show
+
+65 204 ContentFont (ps2) show
+65 190 ContentFont (imps2) show
+65 176 ContentFont (bare) show
+65 162 ContentFont (ms) show
+65 148 ContentFont (mman) show
+65 134 ContentFont (msc) show
+65 120 ContentFont (pnp) show
+65 106 ContentFont (usb) show
+
+
+
+133 204 ContentFont (PS/2 port mouse (most desktops and laptops)) show
+133 190 ContentFont (Microsoft PS/2 Intellimouse) show
+133 176 ContentFont (2 button Microsoft compatible serial mouse) show
+133 162 ContentFont (3 button Microsoft compatible serial mouse) show
+133 148 ContentFont (Logitech serial MouseMan and similar devices) show
+133 134 ContentFont (MouseSystems serial (most 3 button serial mice)) show
+133 120 ContentFont (Plug and Play (serial mice that do not work with ms)) show
+133 106 ContentFont (USB connected mouse) show
+
+
+
+153 71 ButtonFont (<  OK  >) show
+267 71 ButtonFont (< Cancel >) show
+
+stroke
+showpage
+%%EOF

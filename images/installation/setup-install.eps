@@ -1,0 +1,77 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 21 60 450 327
+
+/Outterbox
+{ newpath moveto
+0 259 rlineto
+118 0 rlineto
+23 61 moveto
+426 0 rlineto
+0 259 rlineto
+-125 0 rlineto
+23 87 moveto
+426 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+403 0 rlineto
+0 105 rlineto
+-403 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 13 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont1
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont2
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+34 100 Innerbox
+
+145 316 TitleFont(SELECT PROMPTING MODE) show
+
+33 304 PanelFont (Now you must select the type of prompts you'd like to see during the) show
+33 291 PanelFont (installation process.  if you have the drive space, the 'full' option is) show
+33 278 PanelFont (quick, easy, and by far the most foolproof choice.  The 'newbie' mode) show
+33 265 PanelFont (provides the most information but is much more time-consuming) show
+33 252 PanelFont ((presenting the packages one by one) than the menu-based choices.) show
+33 239 PanelFont (Otherwise, you can pick packages from menus using 'expert' or 'menu') show
+33 226 PanelFont (mode.  Which type of prompting would you like to use?) show
+
+55 191 ContentFont1 (full) show
+55 177 ContentFont1 (menu) show
+55 163 ContentFont1 (expert) show
+55 149 ContentFont1 (newbie) show
+55 135 ContentFont1 (custom) show
+55 121 ContentFont1 (tagpath) show
+55 107 ContentFont1 (help) show
+
+113 191 ContentFont1 (Install everything (5.7+ GB of software, RECOMMENDED!)) show
+113 177 ContentFont1 (Choose individual packages from interactive menus) show
+113 163 ContentFont1 (This is actually the same as the "menu" option) show
+113 149 ContentFont1 (Use verbose prompting (the X series takes one year)) show
+113 135 ContentFont1 (Use custom tagfiles in the package directories) show
+113 121 ContentFont1 (Use tagfiles in the subdirectories of a custom path) show
+113 107 ContentFont1 (Read the prompt mode help file) show
+
+153 71 ButtonFont (<  OK  >) show
+267 71 ButtonFont (< Cancel >) show
+
+stroke
+showpage
+%%EOF

@@ -1,0 +1,139 @@
+
+\chapter*{\markboth{写在前面}{写在前面}写在前面}
+\label{chap:preface}
+
+\addcontentsline{toc}{chapter}{写在前面}
+
+\rule[0mm]{\textwidth}{.1pt} % a separator
+
+\section*{无心插柳}
+\label{sec:preface:purpose}
+
+笔者是从Slackware 13.1开始接触Slackware的，光盘中就附有Slackbook，一本
+很好的官方指南。但由于年代久远（第二版是2005年发行的，写作时是2012年），
+Slackware已经发生了很大的改变，其中的很多内容已不再适用。在网上发现
+2009年是就已经出了Slackbook 3.0的beta版，可正式版仍迟迟不出。一方面为
+了学习Slackware，另一方面为了为Slackware尽一点绵薄之力，遂决定翻译
+Slackbook。
+
+笔者为Slackbook 3.0的beta版翻译了六章，由于beta版的内容实在过于简单，
+与Slackbook 2正式版实有天壤之别，最终决定放弃。但Slackbook 2为已经过时，
+实用价值大打折扣，遂决定在Slackbook 2基础之上，以翻译为主要途径，对其
+中过时的内容加以更新，提供一本好用的Slackware中文指南。
+
+书中会尽量以笔者的使用经验对相关的内容进行陈述，尽量使用第一人称。另外，
+由于很多部分是翻译而来，其中会夹杂着以原作者为第一人称的描述。请见谅。
+另外，笔者水平有限，如有不恰当之处，敬请批评指正。
+
+\section*{目标受众}
+\label{sec:preface:intendedAudience}
+Slackware Linux 操作系统作为一个功能强大的平台，是为基于Intel处理器的计
+算机设计的。它的设计目标是成为一个稳定，安全，实用的高端服务器以及功能
+强劲的工作站。
+
+本书的初衷是带你走进Slackware Linux操作系统。这并不意味着本书涵盖了
+Slackware发行版的方方面面，而是为你展示它能做些什么，并且教会你使用该
+系统的基础知识。
+
+如果你是Slackware的老手，那么我们希望本书可以作为参考手册使用。 当然，
+我们也希望，如果有人向你问起Slackware，你可以向他们介绍介绍本书。
+Slackware，谁用谁知道。
+
+当然，这本书不可能像小说一样吸引人，我们会尽我们所能地写得更有趣。写得
+好的话说不定还会有人请我们写剧本？当然，我们最希望的是你能从中学习到你
+认为有用的知识。
+
+现在，准备被亮瞎吧！
+
+\section*{为什么写本新的？}
+\label{sec:preface:whyANewSlackwareBook}
+在现存的Linux发行版中，Slackware Linux算得上是爷爷辈的，但这并不
+意味着它与时代脱节。Slackware的确尝试过保持纯正的Unix风格，但还是没能逃
+过时代的进步的历程。子系统不一样了，窗口管理器变来变去，人们又发明了新的方
+法来管理复杂的现代操作系统。我们确实反对为了改变而改变，但当事物进化了，相
+应的文档就变得陈旧了，一切都是无法避免的——包括书籍。
+
+\section*{本书中的一些约定}
+\label{sec:preface:conventionsUsedInThisBook}
+
+为了保持一致性，同时方便大家阅读，全书遵守一些约定。
+
+\subsection*{印刷上的约定}
+\label{sec:preface:conventions:typographic}
+
+\begin{description}
+\item[\textit{Italic}] 斜体字\textit{Italic}用于表示命令、强调、及技术名词第一次出现的地
+  方。
+\item[\texttt{Monospace}] 等宽字体\texttt{monospaced}用于表示错误信息、
+  命令、环境变量、端口名、主机名、用户名、组名、设备名、变量及代码段。
+\item[\textbf{Bold}] 粗体字用于表示例子中的用户输入。
+\end{description}
+
+\subsection*{用户输入}
+\label{sec:preface:conventions:userInput}
+
+输入用粗体表示，用以区别其它的字符。至于键组合，我们用`+'来连接各个字
+符以表示要同时按下，例如：
+\begin{Verbatim}[frame=single]
+Ctrl+Alt+Del
+\end{Verbatim}
+意味着我们必须同时按下\textit{Ctrl}，\textit{Alt}，以及\textit{Del}键。
+
+有时候是要先后键入的，我们用逗号来分隔它们，例如：
+\begin{Verbatim}[frame=single]
+Ctrl+X, Ctrl+S
+\end{Verbatim}
+就代表我们要先同时输入\textit{Ctrl}和\textit{X}键，接着同时输入
+\textit{Ctrl}键和\textit{S}键。
+
+\subsection*{例子}
+\label{sec:preface:conventions:examples}
+
+以\texttt{E：\textbackslash{}\textgreater}开始的例子代表这是一个
+MS-DOS\textregistered{}命令。除非特别说明，这些命令都是在
+\textbf{Microsoft}\textregistered{}
+\textbf{Windows}\textregistered{}``命令提示符''之下运行的。
+\begin{Verbatim}[frame=single]
+D:\> rawrite a: bare.i
+\end{Verbatim}
+
+以\texttt{\#}开始的例子代表执行一个命令时必须使用Slackware中超级用户的
+权限执行。你可以直接以\texttt{root}登陆，也可以以普通用户登陆，之后再
+用\texttt{su(1)}来获得超级用户的权限。
+\begin{Verbatim}[frame=single]
+# dd if=bare.i of=/dev/fd0
+\end{Verbatim}
+
+以\texttt{\%}开始的例子代表执行命令时只须使用普通用户权限。除非特别说
+明，我们将使用C-shell语法来设置环境变量以及其它的shell命令。
+\begin{Verbatim}[frame=single]
+% top
+\end{Verbatim}
+
+\section*{致谢}
+\label{sec:preface:acknowledgments}
+
+这个项目是由许多人花费几个月的贡献累积而成的。仅凭我一已之力，是不可能
+凭空创造出的。我们要感谢许许多多的人，感谢他们无私的奉献：Keith Keller
+写了无线网络方面的内容；Joost Kremers单枪匹马完成了emacs这一章；Simon
+Williams完成了安全这章；Jurgen Phillippaerts完成基础网络命令的内容；
+Cibao Cu Ali G Colibri带来的启发以及在裤子上揣的一脚\footnote{原文为 a
+good kick in the pants. 译者对这些幽默不是很理解。}。还有数不清的人为
+我们提出了建议及文章的修正。下面是一个完整的列表：Jacob Anhoej, John
+Yast, Sally Welch, Morgan Landry, 及Charlie Law。同时，我也要感谢Keith
+Keller为这个项目管理邮件列表，感谢Carl Inglis为我们的管理网页。最后但
+并非最不重要，我要感谢Patrick J. Volkerding创建了Slackware Linux，以及
+David Cantrell, Logan Johnson及Chris Lumens，是他们完成了Slackware
+Linux 精要的第一版。如果没有他们的初始框架，本书的一切都不可能发生。还
+有许多其它的人在本项目中的大大小小的方面做了贡献，但在此没有列出。希望
+他们能原谅我记忆不好。
+
+Alan Hicks。 2005年5月。
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 

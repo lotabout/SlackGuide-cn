@@ -1,0 +1,65 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 21 60 438 282
+
+/Outterbox
+{ newpath moveto
+0 214 rlineto
+123 0 rlineto
+23 61 moveto
+414 0 rlineto
+0 214 rlineto
+-145 0 rlineto
+23 87 moveto
+414 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+391 0 rlineto
+0 36 rlineto
+-391 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+34 100 Innerbox
+
+150 272 TitleFont(MAKE USB FLASH BOOT) show
+
+34 260 PanelFont (If your computer supports booting from a USB device, it is) show
+34 246 PanelFont (recommended that you make a USB boot stick for your system at this) show
+34 232 PanelFont (time.  It will boot your computer straight into the root filesystem) show
+34 218 PanelFont (on /dev/sda1.) show
+
+34 190 PanelFont (Please insert a USB flash memory stick and then press ENTER to) show
+34 176 PanelFont (create a boot stick.) show
+
+34 148 PanelFont (WARNING!  The existing contents of the USB stick will be erased.) show
+
+43 122 ContentFont (Create) show
+43 108 ContentFont (Skip) show
+
+106 122 ContentFont (Make a USB Linux boot stick) show
+106 108 ContentFont (Skip making a USB boot stick) show
+
+153 71 ButtonFont (<  OK  >) show
+267 71 ButtonFont (< Cancel >) show
+
+stroke
+showpage
+%%EOF

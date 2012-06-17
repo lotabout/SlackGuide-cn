@@ -1,0 +1,77 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 21 60 450 327
+
+/Outterbox
+{ newpath moveto
+0 259 rlineto
+118 0 rlineto
+23 61 moveto
+426 0 rlineto
+0 259 rlineto
+-125 0 rlineto
+23 87 moveto
+426 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+403 0 rlineto
+0 88 rlineto
+-403 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 13 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont1
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont2
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+34 100 Innerbox
+
+145 316 TitleFont(SELECT FILESYSTEM FOR /dev/sda1) show
+
+33 304 PanelFont (Please select the type of filesystem to use for the specified) show
+33 291 PanelFont (device.  here are descriptions of the available filesystes: Ext2) show
+33 278 PanelFont (is the traditional Linux file system and is fast and stable. Ext3) show
+33 265 PanelFont (is the journaling version of the Ext2 filesystem.  Ext4 is the) show
+33 252 PanelFont (successor to the ext3 filesystem.  JFS is IBM's Journaled) show
+33 239 PanelFont (Filesystem, currently used in IBM enterprise servers.  ReiserFS is a) show
+33 226 PanelFont (journaling filesystem that stores all files and filenames in a) show
+33 213 PanelFont (balanced tree structure.  XFS is SGI's journaling filesystem that) show
+33 200 PanelFont (originated on IRIX.) show
+
+55 177 ContentFont1 (ext2) show
+55 163 ContentFont1 (ext3) show
+55 149 ContentFont1 (ext4) show
+55 135 ContentFont1 (jfs) show
+55 121 ContentFont1 (reiserfs) show
+55 107 ContentFont1 (xfs) show
+
+133 177 ContentFont1 (Standard Linux Ext2 Filesystem) show
+133 163 ContentFont1 (Ext3 Journaling Filesystem) show
+133 149 ContentFont1 (Ext4 Journaling Filesystem) show
+133 135 ContentFont1 (IBM's Journaled Filesystem) show
+133 121 ContentFont1 (ReiserfFS Journaling Filesystem) show
+133 107 ContentFont1 (SGI's Journaling Filesystem) show
+
+153 71 ButtonFont (<  OK  >) show
+267 71 ButtonFont (<Cancel>) show
+
+stroke
+showpage
+%%EOF

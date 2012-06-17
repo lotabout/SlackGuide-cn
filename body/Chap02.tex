@@ -1,0 +1,250 @@
+
+\chapter{帮助}
+\label{chap:help}
+
+\rule[0mm]{\textwidth}{.1pt}
+
+在配置一个程序或安装一个硬件时，我们时常需要查看某个命令的帮助。也可能
+是你想对一个命令更深入地了解，或者查看它别的选项。好在我们有很多方式来
+得到我们寻求的帮助。在安装Slacware时，其中的``F''系列就包含了FAQ和
+HOWTO文档，你可以选择安装它。一般程序都会包含关于选项、配置文件及使用
+方法的帮助。
+
+\section{系统帮助}
+\label{sec:help:systemHelp}
+
+\subsection{man}
+\label{sec:help:systemHelp:man}
+
+\texttt{man}命令（``manual''的缩写）是Unix及Linux系统中最为传统的在线
+文档。``man手册页''由特定格式的文件构成，涵盖了绝大多数命令，并与软件
+本身一同发布。很自然地，执行命令\texttt{man somecommand}就显示指定命令
+的man手册页，本例中，则应该显示我们虚构的命令\texttt{somecommand}的手
+册页。
+
+你可能立即会想到，man手册页的数量会急剧上升，最后连高级用户都会被弄得
+晕头转向的。因此，man手册被分为几个节。这个设定已经存在很久了；久到我
+们会经常看到一些命令、程序甚至是编程库函数在引用时都附上了man的节号。
+例如：
+
+你可能会看到诸如\texttt{man\textbf{(1)}}的引用。其中的数字告诉我们
+``\texttt{man}''的文档在第一节（用户命令）；你也可以用命令\texttt{man
+  1 man}命令来为``man''指定查看手册的第一节。在一个同名的项有多个手册
+页时，指定man应查看的节号是很有用的。
+
+\begin{table}[hpbf]
+  \centering
+  \begin{tabular}{rl}
+    \hline \hline 
+    \textbf{节号} & \textbf{内容} \\ \hline 
+    第~1~节 & 用户命令（只含介绍） \\
+    第~2~节 & 系统调用 \\
+    第~3~节 & C库调用 \\
+    第~4~节 & 设备及特殊文件 \\
+    第~5~节 & 文件格式及协议（即，wtmp、\texttt{/etc/passwd}及nfs等）
+    \\
+    第~6~节 & 游戏（只含介绍） \\
+    第~7~节 & 一些约定，宏包等（即nroff,ascii等） \\
+    第~8~节 & 系统管理（只含介绍） \\
+    \hline \hline
+    
+  \end{tabular}
+  \caption{man手册分节}
+  \label{tab:manPageSections}
+\end{table}
+
+除了\texttt{man\textbf{(1)}}，还可以使用其它命令：
+\texttt{whatis\textbf{(1)}}及\texttt{apropos\textbf{(1)}}。这些命令的
+目的是使我们更容易在man系统中找到有用信息。
+
+\texttt{whatis}命令会为系统命令给出非常简洁的描述，就像放在口袋的小抄
+一样。
+
+例如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\$ \textbf{whatis whatis}
+whatis []            (1)  - search the whatis database for complete words
+\end{Verbatim}
+
+\texttt{apropos}命令的作用是：给定一个关键词，在man手册页中搜索含有该
+关键词的内容。
+
+例如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\$ \textbf{apropos wav}
+SDL_FreeWAV          (3)  - Frees previously opened WAV data
+SDL_FreeWAV []       (3)  - Frees previously opened WAV data
+SDL_LoadWAV          (3)  - Load a WAVE file
+SDL_LoadWAV []       (3)  - Load a WAVE file
+cdda2wav []          (1)  - a sampling utility that dumps CD audio
+ data into wav sound files
+cwaves []            (6)  - languid sinusoidal colors
+fadeplot []          (6)  - draws a waving ribbon following a sinusoidal path
+interference []      (6)  - decaying sinusoidal waves
+oggdec []            (1)  - simple decoder, Ogg Vorbis file to PCM
+ audio file (WAV or RAW)
+pilot []             (1)  - wav - Decodes Palm Voice Memo files to
+ wav files you can read on your desktop
+wavelan []           (4)  - AT&T GIS WaveLAN ISA device driver
+\end{Verbatim}
+如果你想深入了解这些命令，请阅读它们的man手册以获取更多信息。:)
+
+\subsection{\texttt{/usr/doc}文件夹}
+\label{sec:help:systemhelp:usrDoc}
+
+我们构建的多数软件包含有一些文档：README文件、使用说明及许可文件等。源
+码中包含的任何文档都安装在系统的\texttt{/usr/doc}文件夹。每个文件都会
+（一般而言是的）在\texttt{/usr/doc}中创建自己的文件夹，并将文档放在该
+文件夹中，该文件夹的名字遵守如下约定：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+/usr/doc/\$program-\$version
+\end{Verbatim}
+其中，\texttt{\$program}表示你想查找的程序的名字，\texttt{\$version}字
+段（很明显）表示在系统中安装的软件的版本号。
+
+例如，想阅读关于命令\texttt{man\textbf{(1)}}的文档，你可能想用
+\texttt{cd}命令切换到目录：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\$ \textbf{cd /usr/doc/man-\$version}
+\end{Verbatim}
+如果对应的man手册页没有提供足够的信息，或者没有你想找的那些信息，那么
+接下来可以考虑阅读\texttt{/usr/doc}文件夹下的相关内容。
+
+\subsection{HOWTO及mini-HOWTO}
+\label{sec:help:systemHelp:howto}
+
+归功于开源社区的最真挚的精神，我们才有了HOWTO/mini-HOWTO。这些文件跟名
+字一样，是一些如何完成某些任务的文档或指南。如果你选择了安装HOWTO文档，
+那么它们会被安装在\texttt{/usr/doc/Linux-HOWTOs}，mini-HOWTO会被安装在
+\texttt{/usr/doc/Linux-mini-HOWTOs}。
+
+该软件包中还含有FAQ集，FAQ是\textbf{F}requently \textbf{A}sked
+\textbf{Q}uestions，中文含义为``常问问题''。这些文档是以问答的形式写成
+的。如果你只是想快速地解决一个问题，那么通常选择查看FAQ是极其有用的。
+如果在安装时选择安装FAQ，那么它们会被安装在
+\texttt{/usr/doc/Linux-FAQs}目录下。
+
+在你不知道如何处理一些东西时，这些文档通常是值得阅读的。它们涵盖了相当
+大的范围，而且解决方法通常很详细，详细到不可思议。好东西是吧！
+
+\section{在线帮助}
+\label{sec:help:onlineHelp}
+
+除了Slackware中可以提供安装的这些文档外，在网上还在大量的在线资源可供
+我们学习。
+
+\subsection{官网及论坛}
+\label{sec:help:onlineHelp:website}
+Slackware官网\footnote{www.slackware.com}
+
+Slackware的官网有时比较过时，但还是有关于最新的Slackware版本的一些信息。
+有一个时期官网上是有在线帮助的，但后来多了很多人来骚扰生事，导致维护这
+个论坛变得很不容易，于是Patrick就把论坛关了。如果想找的话，可以在
+\url{http://www.userlocal.com/phorum/}上找到之前数据的一个可搜索的归档。
+
+在\url{http://slackware.com}上的论坛挂掉之后，一些其它的站点如雨后春笋
+般崛起以提供Slackware的论坛支持。经过再三思量，Pat决定将
+\url{http://www.linuxquestions.org}作为Slackware的官方论坛。
+
+\subsection{E-mail支持}
+\label{sec:help:onlineHelp:emailSupport}
+
+据说只要购买官方的CD，就可以通过电子邮件得到开发人员的免费安装支持。话
+虽如此，请记住，我们Slackware的开发人员（及绝大多数的用户）是``老派
+\footnote{The Old School}''。这意味着我们更倾向于帮助那些真的有兴趣的
+``自助者''。无论谁给我们发email问问题，我们都会尽我们所能帮助他们。然
+而，请在发email前查阅相关的文档及网站（尤其是FAQ及下列的一些论坛）。因
+此通过这些途径你可能更快得到答案，同时我们也可以少回一些email，显然，
+我们也才能够更快地帮助那些需要帮助的人们。
+
+技术支持的email是\texttt{support@slackware.com}\footnote{作者没有给他
+  们发过邮件，不知道该邮箱的有效性。}。其它的邮箱地址及联系信息都在官
+网上给出。
+
+\subsection{Slackware的邮件列表}
+\label{sec:help:onlineHelp:mailingLists}
+
+我们有许多邮件列表，不论是摘要式的，还是正常格式的。请查阅如何订阅邮件
+列表的说明。
+
+要订阅邮件列表，请发送邮件到
+\begin{verbatim}
+majordomo@slackware.com
+\end{verbatim}
+邮件正文写上``\texttt{subscribe [列表名]}''。列表名的描述在下面（使用
+下面列出的名字中的任意一个）。
+
+邮件列表的完整归档可以在Slakcware的官网上找到：
+\url{http://slackware.com/lists/archive}
+
+\begin{description}
+\item[slackware-announce] \hfill \\
+ \texttt{slackware-announce} 邮件列表是关于新
+  版本的声明，主要的一些更新及其它一般的信息
+\item[slackware-security] \hfill \\
+  \texttt{slackware-security} 邮件列表是关于安
+  全问题的声明。任何直接涉及到Slackware的任何攻击或者漏洞都会立即在这
+  份列表上发布。
+\end{description}
+这些列表还有对应的摘要版本。这意味着你可以每天得到一条大的信息而不是每
+天得到一大堆的信息。由于Slackware的邮件列表并不允许用户发表信息，因此
+该列表的流量很小，所以多数用户认为摘要版没什么用。但如果你需要的话，只
+要订阅\texttt{slackware-announce-digest}或
+\texttt{slackware-security-digest}即可。
+
+\subsection{非官方的网站及论坛}
+\label{sec:help:onlineHelp:nonOfficial}
+
+\subsubsection{网站}
+\label{sec:help:onlineHelp:nonOfficial:websites}
+
+\begin{description}
+\item[Google (\url{http://www.google.com})] \hfill \\
+搜索引擎的功夫大师。当你积极地、真心地想找到一个主题的每一个信息：它是
+不二之选。
+\item[Google:Linux(\url{http://www.google.com/linux})] \hfill \\
+专门搜索Linux版块。
+\item[Google:BSD(\url{http://www.google.com/bsd})] \hfill \\
+专门搜索BSD的内容。Slackware是一个类Unix的通用系统，通用到经常可以在这
+里找到一些与Slackware百分百相关的详细信息。很多时候，一个BSD内容的搜索
+会比一般的面向大众的Linux搜索得到更多的技术细节。
+\item[Google:Groups(\url{http://groups.google.com})] \hfill \\
+搜索几十年来Usenet上的文章来发掘你的智慧之光。
+\item[\url{http://userlocal.com}] \hfill \\
+一个关于知识、好建议、第一手经验及有趣文章的宝库。通常我们会在这里听到
+Slackware世界的新进展。
+\end{description}
+
+\subsubsection{网络资源}
+\label{sec:help:onlineHelp:nonOfficial:webbasedResources}
+
+\begin{description}
+\item[linuxquestions.org]\footnote{\url{http://www.linuxquestions.org/questions/forumdisplay.php?forumid=14}} \hfill \\
+Slackware 官方认可的论坛。
+\item[LinuxISO.org Slackware论坛]\footnote{貌似和Linuxquestions.org合并
+    了，新网址是\url{iso.linuxquestions.org/slackware}} \hfill \\
+``一个下载Linux和寻求帮助的地方''。
+\item[alt.os.linux.slackware FAQ]\footnote{貌似挂掉了。\url{http://wombat.san-francisco.ca.us/perl/fom}} \hfill \\
+另一个FAQ。
+\end{description}
+
+\subsubsection{Usenet小组（NNTP）}
+\label{sec:help:onlineHelp:nonOffice:usenet}
+
+Usenet一直以来都是geek们聚集并互相帮助的地方。其中有几个致力于
+Slackware的内容。但里面的人更多的是在行的人。
+\begin{verbatim}
+alt.os.linux.slackware
+\end{verbatim}
+\texttt{alt.os.linux.slackware}，更为人所知的名字是aols（不要和
+AOL\textregistered{}混起来！），在遇到Slackware的问题时，是获取相关的
+技术帮助的最活跃的地方。就像所有的Usenet新闻组一样，一些不帮忙的参与者
+（``山精''们\footnote{斯堪的那维亚神话中的，邪恶的巨怪或顽皮的侏儒}）
+总是糟到大家的非议。学会无视那些山精们，认出那些真心帮助别人的人，对于
+使这个资源最大化利用很重要。
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 

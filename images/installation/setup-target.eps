@@ -1,0 +1,64 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 22 60 439 220
+
+/Outterbox
+{ newpath moveto
+0 154 rlineto
+97 0 rlineto
+23 61 moveto
+415 0 rlineto
+0 154 rlineto
+-138 0 rlineto
+23 87 moveto
+415 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+392 0 rlineto
+0 79 rlineto
+-392 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+35 99 Innerbox
+
+123 211 TitleFont(Select Linux installation partition:) show
+
+36 197 PanelFont (Please select a partition from the following list to use for your) show
+36 185 PanelFont (root (/) Linux partition.) show
+
+72 160 ContentFont (/dev/sda1) show
+72 146 ContentFont (/dev/sda3) show
+72 132 ContentFont ( - - - ) show
+72 118 ContentFont ( - - - ) show
+72 104 ContentFont ( - - - ) show
+
+158 160 ContentFont (Linux 10490413K) show
+158 146 ContentFont (Linux 14659312K) show
+158 132 ContentFont ((done addint partitions, continue with setup)) show
+158 118 ContentFont ((done adding partitions, continue with setup)) show
+158 104 ContentFont ((done adding partitions, continue with setup)) show
+
+153 71 ButtonFont (< Select >) show
+267 71 ButtonFont (<Continue>) show
+
+stroke
+showpage
+%%EOF

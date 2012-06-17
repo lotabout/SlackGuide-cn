@@ -1,0 +1,72 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 21 60 449 317
+
+/Outterbox
+{ newpath moveto
+0 240 rlineto
+88 0 rlineto
+23 61 moveto
+425 0 rlineto
+0 240 rlineto
+-88 0 rlineto
+23 87 moveto
+425 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+402 0 rlineto
+0 111 rlineto
+-402 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+34 100 Innerbox
+
+114 298 TitleFont(SELECT DEFAULT WINDOW MANAGER FOR X) show
+
+34 286 PanelFont (Please select the default window manager to use with the X Window) show
+34 272 PanelFont (System.  This will define the style of graphical user interface the) show
+34 258 PanelFont (computer uses.  KDE provides the most features, and people with) show
+34 244 PanelFont (Windows or MacOS experience will find it easy to use.  Other window) show
+34 230 PanelFont (managers are easier on system resources, or provide other unique) show
+34 216 PanelFont (features.) show
+
+60 198 ContentFont (xinitrc.kde) show
+60 184 ContentFont (xinitrc.xfce) show
+60 170 ContentFont (xinitrc.fluxbox) show
+60 156 ContentFont (xinitrc.blackbox) show
+60 142 ContentFont (xinitrc.wmaker) show
+60 128 ContentFont (xinitrc.fvwm2) show
+60 114 ContentFont (xinitrc.twm) show
+
+171 198 ContentFont (KDE: K Desktop Environment) show
+171 184 ContentFont (The Cholesterol Free Desktop Environment) show
+171 170 ContentFont (The fluxbox window manager) show
+171 156 ContentFont (The blackbox window manager) show
+171 142 ContentFont (WindowMaker) show
+171 128 ContentFont (F(?) Virtual Window Manager (version 2.xx)) show
+171 114 ContentFont (Tab Window Manager (very basic)) show
+
+163 71 ButtonFont (<  OK  >) show
+277 71 ButtonFont (< Cancel >) show
+
+stroke
+showpage
+%%EOF

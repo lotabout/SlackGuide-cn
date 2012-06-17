@@ -1,0 +1,61 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 22 60 439 258
+
+/Outterbox
+{ newpath moveto
+0 183 rlineto
+137 0 rlineto
+23 61 moveto
+415 0 rlineto
+0 183 rlineto
+-125 0 rlineto
+23 87 moveto
+415 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+352 0 rlineto
+0 27 rlineto
+-352 0 rlineto
+closepath} def
+
+
+/TitleFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+
+54 100 Innerbox
+
+163 239 TitleFont(SWAP SPACE DETECTED) show
+
+63 220 PanelFont (Slackware Setup has detected one or more swap partitions ) show
+63 206 PanelFont (on your system.  These partitions have been preselected ) show
+63 192 PanelFont (to be set up as swap space.  If there are any swap ) show
+63 178 PanelFont (partitions that you do not wish to use with this ) show
+63 164 PanelFont (installation, please unselect them with the up and down ) show
+63 150 PanelFont (arrows and spacebar.  if you wish to use all of them) show
+63 136 PanelFont ((this is recommend), simply hit the ENTER key. ) show
+
+99 110 PanelFont ( [X] /dev/sda2  Linux swap partition, 1060290KB ) show
+
+153 71 ButtonFont (<  OK  >) show
+267 71 ButtonFont (<Cancel>) show
+
+stroke
+showpage
+%%EOF

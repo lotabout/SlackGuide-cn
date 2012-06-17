@@ -1,0 +1,64 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 22 60 438 226
+/Outterbox
+{ newpath moveto
+0 160 rlineto
+125 0 rlineto
+23 61 moveto
+414 0 rlineto
+0 160 rlineto
+-130 0 rlineto
+23 87 moveto
+414 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+390 0 rlineto
+0 96 rlineto
+-390 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+35 99 Innerbox
+
+153 217 TitleFont(SOURCE MEDIA SELECTION) show
+
+35 204 PanelFont (Please select the media from which to install Slackware Linux:) show
+
+104 178 ContentFont (1) show
+104 164 ContentFont (2) show
+104 150 ContentFont (3) show
+104 136 ContentFont (4) show
+104 122 ContentFont (5) show
+104 108 ContentFont (6) show
+
+123 178 ContentFont (Install from a Slackware CD or DVD) show
+123 164 ContentFont (Install from a hard drive partition) show
+123 150 ContentFont (Install from NFS (Network File System)) show
+123 136 ContentFont (Install from FTP/HTTP server) show
+123 122 ContentFont (Install from Samba share) show
+123 108 ContentFont (Install from a pre-mounted directory) show
+
+133 71 ButtonFont (<  OK  >) show
+247 71 ButtonFont (<  Cancel  >) show
+
+stroke
+showpage
+%%EOF

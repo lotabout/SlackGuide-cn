@@ -1,0 +1,68 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 22 60 348 339
+
+/Outterbox
+{ newpath
+23 61 moveto
+0 273 rlineto
+70 0 rlineto
+23 61 moveto
+324 0 rlineto
+0 273 rlineto
+-80 0 rlineto
+23 88 moveto
+324 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+302 0 rlineto
+0 157 rlineto
+-302 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+35 100 Innerbox
+
+95 330 TitleFont(KEYBOARD MAP SELECTION) show
+
+33 318 PanelFont (You may select one of the following keyboard maps.) show
+33 304 PanelFont (If you do not select a keyboard map, 'us.map' \(the) show
+33 290 PanelFont (US keyboard map\) is the default.  Use the UP/DOWN) show
+33 276 PanelFont (arrow keys and PageUp/PageDown to scroll through) show
+33 262 PanelFont (the whole list of choices.) show
+
+99 240 ContentFont (qwerty/us.map) show
+99 227 ContentFont (azerty/azerty.map) show
+99 214 ContentFont (azerty/be-latin1.map) show
+99 201 ContentFont (azerty/fr-latin1.map) show
+99 188 ContentFont (azerty/fr-latin9.map) show
+99 175 ContentFont (azerty/fr-pc.map) show
+99 162 ContentFont (azerty/fr.map) show
+99 149 ContentFont (azerty/wangbe.map) show
+99 136 ContentFont (azerty/wangbe2.map) show
+99 123 ContentFont (dvorak/ANSI-dvorak.map) show
+99 110 ContentFont (dvorak/dvorak-l.map) show
+
+103 71 ButtonFont (<  OK  >) show
+190 71 ButtonFont (< Cancel >) show
+
+stroke
+showpage
+%%EOF

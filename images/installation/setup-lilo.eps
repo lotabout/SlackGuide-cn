@@ -1,0 +1,67 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 21 60 419 287
+
+/Outterbox
+{ newpath moveto
+0 221 rlineto
+138 0 rlineto
+23 61 moveto
+395 0 rlineto
+0 221 rlineto
+-170 0 rlineto
+23 87 moveto
+395 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+372 0 rlineto
+0 52 rlineto
+-372 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+34 100 Innerbox
+
+165 277 TitleFont(INSTALL LILO) show
+
+34 265 PanelFont (LILO (Linux Loader) is a generic boot loader.  There's a simple) show
+34 252 PanelFont (installation which tries to automatically set up LILO to boot) show
+34 239 PanelFont (Linux (also Windows if found).  For more advanced users,) show
+34 226 PanelFont (the expert option offers more control over the installation) show
+34 213 PanelFont (process.  Since LILO does not work in all cases \(and can damage) show
+34 200 PanelFont (partitions if incorrectly installed\), there's the third (safe)) show
+34 187 PanelFont (option, which is to skip installing LILO for now.  You can) show
+34 174 PanelFont (always install it later with the 'liloconfig' command.  Which) show
+34 160 PanelFont (option would you like?) show
+
+98 137 ContentFont (simple) show
+98 122 ContentFont (expert) show
+98 109 ContentFont (skip) show
+
+140 137 ContentFont (Try to install LILO automatically) show
+140 122 ContentFont (Use expert lilo.conf setup menu) show
+140 109 ContentFont (Do not install LILO) show
+
+123 71 ButtonFont (<  OK  >) show
+237 71 ButtonFont (< Cancel >) show
+
+stroke
+showpage
+%%EOF
