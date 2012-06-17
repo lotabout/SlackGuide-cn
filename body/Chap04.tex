@@ -293,6 +293,189 @@ System V初始化脚本的商业软件包而言是很重要的。
 要停用某个脚本，也只需要去除相应脚本的执行权限即可。关于\texttt{chmod}
 命令的更多信息，请参见第//TODO:Section 9.2//节。
 
+\section{选择内核}
+\label{sec:systemConfig:selectingAKernel}
+内核在一个操作系统中起着至关重要的作用，它提供了对硬件的访问、对进程的
+控制以及整个系统的控制。内核中包含了对硬件设备的支持，所以在安装的时候
+选择合适的内核是很重要的。
+
+Slackware提供了不止一打的提前编译好的内核可供选择，每个内核都包含一个
+标准的驱动集合和一些特定的驱动。你可以选择直接使用提前编译的内核或从源
+码编译自己的内核。不管使用哪种方法，都要确保内核中包含系统所需的所有硬
+件支持。
+
+\subsection{Slackware CD-ROM上的/kernels文件夹}
+\label{sec:systemConfig:selectingAKernel:kernelsDirctory}
+
+提前编译的内核可以在Slackware的CD或DVD上或FTP站点上的Slackware文件夹下
+的\texttt{/kernels}文件夹中找到。新的版本发布后，其中可用的内核也会发
+生改变，而该文件夹下的文档则是权威的。\texttt{/kernels}文件夹为每个内
+核准备了一个子文件夹，每个子文件夹的名字都与它们对应的启动盘名相同。在每
+个子文件夹中，你会找到以下文件：
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{r|l}
+    \hline\hline 
+    文件名 & 作用 \\ \hline
+    System.map & 内核的系统映射文件 \\
+    bzImage & 内核本体 \\
+    config & 内核源码配置文件  \\
+    \hline\hline
+  \end{tabular}
+  \caption{kernel文件夹中的文件}
+  \label{tab:kernelFiles}
+\end{table}
+
+要使用一个内核，将\texttt{System.map}及\texttt{config}文件拷贝到
+\texttt{/bot}目录中，并将内核镜像\footnote{kernel image，image不知道应
+  该怎么翻才好。}复制到\texttt{/boot}文件夹下，重命名为
+\texttt{vmlinuz}，之后，运行\texttt{/sbin/lilo\textbf{(8)}}命令为
+新的内核安装LILO，重启即可。这就是安装一个新内核的步骤。
+
+接下来的内容是过时的。以.i结尾的内核是为IDE设备准备的，这些内核不支持
+对SCSI。以.s结尾的内核为SCSI内核，支持IDE，同时支持SCSI。
+
+\subsection{从源码编译内核}
+\label{sec:systemConfig:selectingAKernel:compilingAKernel}
+
+新手们常问的一个问题是``我需要自己编译一个内核吗？''。答案是也也许吧。
+有一些情况下是需要为自己的系统编译内核的。多数用户只需使用编译好的内核，
+外加一些可加载的内核模块就可以构建一个可用的系统了。如果你想使用一个
+Slackware当前不提供的新的内核版本，或者你想对内核添加补丁以获取对一些
+当前内核不支持的设备的支持，那么你可能需要为自己的系统重新编译内核。如，
+一些有SMP功能的系统就会考虑编译一个带SMP支持的内核。许多用户还会自己编
+译内核来让机器跑得更快些。要是想针对某些特定的处理器做优化，编译内核也
+是有帮助的。
+
+编译自己的内核其实并不难。首先是确保你的机器上安装了内核的源码。即安装
+是切记选择安装K系列下的软件包。当然，也要确保安装了D系列的软件包，我们
+需要的是D系列中的C编译器、GNU make、及GNU binutils。一般而言，如果做的
+工作与开发有关，那么把D系列的软件包全装上会是个不错的选择。你也可以从
+\url{http://www.kernel.org/mirrors}网站下载最新的内核源码。
+
+
+\subsection{2.4.x版本的内核编译}
+\label{sec:systemConfig:selectingAKernel:2_4_x}
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{su -}
+Password:
+\# \textbf{cd /usr/src/linux}
+\end{Verbatim}
+
+第一个步骤是让内核处于默认的状态。使用下面的命令（注意，该命令会删除
+\texttt{.config}文件，且没有任何提示，需要的话，可以先进行备份）：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\# \textbf{make mrproper}
+\end{Verbatim}
+
+接下来，我们就可以根据自己的系统来配置内核了。当前的内核提供三种方式。
+第一种基于文本的问答系统，它会问用户一系列问题并根据用户的回答来创建配
+置文件。这个方法的一个问题就是如果你搞杂了，就得重新来过。多数人选择的
+是第二种方式——基于菜单的方式。第三种是基于X的配置工具。选择好你喜欢的
+方式，通过执行下面对应的命令即可：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  \# \textbf{make config}     （基于文本的问答系统）
+  \# \textbf{make menuconfig} （基于文本的菜单驱动系统）
+  \# \textbf{make xconfig}    （基于X的版本，请先确保自己在使用X系统）
+\end{Verbatim}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/selectingKernel/make-menuconfig.eps}
+  \caption{内核配置菜单}
+  \label{fig:make-menuconfig}
+\end{figure}
+
+对于新用户而言，\texttt{menuconfig}应该是最容易使用的方式。其中提供了
+帮助，解释了内核各部分的功能。配置完成后退出配置程序。它会创建一个必要
+的配置文件。之后我们就可以准备用来编译的源码树了：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  \# \textbf{make dep}
+  \# \textbf{make clean}
+\end{Verbatim}
+
+下个步骤就是编译内核。首先尝试如下命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  \# \textbf{make bzImage}
+\end{Verbatim}
+
+根据你的CPU速度，这个命令会跑上一会。编译的过程中会显示一些编译器的信
+息。编译完成之后，我们还需要编译之前配置时标记为模块的部分。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  \# \textbf{make modules}
+\end{Verbatim}
+
+接下来就是安装刚编译好的内核了。要在Slackware系统上安装内核，可以使用
+如下的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  \# \textbf{mv /boot/vmlinuz /boot/vmlinuz.old}
+  \# \textbf{cat arch/i386/boot/bzImage > /boot/vmlinuz}
+  \# \textbf{mv /boot/System.map /boot/System.map.old}
+  \# \textbf{cp System.map /boot/System.map}
+  \# \textbf{make modules_install}
+\end{Verbatim}
+之后是重新配置LILO加载新的内核。首先修改\texttt{/etc/lilo.conf}文件并
+为老的内核添加相应的启动项。完成后运行\texttt{/sbin/lilo}来安装新的启
+动块。最后重启并以新的内核启动即可。
+
+
+\subsection{2.6.x版本的内核编译}
+\label{sec:systemConfig:selectingAKernel:2_6_x}
+2.6版本的内核编译与2.4或2.2的内核只有小部分的区别，但在深究之前了解其
+中的差异还是很有必要的。编译2.6内核时，不再需要运行\texttt{make dep}及
+\texttt{make clean}了，并且在2.6系列内核中，编译时不再像之前的版本一
+亲显示很详细的信息。结果就是编译过程更容易理解了，当然，这样做也有一些
+短处。所以如果在编译过程中出了什么错误，我们强烈建议你选择显示详细信息。
+只要在编译时加上\texttt{V=1}选项即可。显示更为详细的信息有助于内核开发
+人员记录更多信息，在别的geek帮助你时也能更有效率。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  \# \textbf{make bzImage V=1}
+\end{Verbatim}
+
+
+\subsection{使用内核模块}
+\label{sec:systemConfig:selectingAKernel:usingKernelModules}
+
+内核模块可以认为是设备驱动的一个别名，我们可以在内核运行时对其动态加载
+与卸载。通过内核模块，我们在不选择另一个内核或自己编译内核的情况下就能
+添加对新硬件的支持。
+
+模块可以在任何时刻进行加载或卸载。这使得系统管理员在更新一些特定驱动时
+变得很容易。编译新的模块 --> 卸载旧的模块 --> 加载新的模块，连重启系统
+都不需要。
+
+所有的模块都存储在\texttt{/lib/modules/kernel-version}目录下
+（kernel-version处根据你的系统而定）。它们可以通过\texttt{rc.modules}
+文件在启动时就加载。这个文件的注释很很，并为主要的硬件提供了配置的实例。
+使用\texttt{lsmod\textbf{(1)}}可以显示当前活动的模块：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  \# \textbf{lsmod}
+  Module        Size    Used by
+  parport_pc    7220     0
+  parport       7844     0   [parport_pc]
+\end{Verbatim}
+就上面的例子而言，可以看到我只加载了并口的模块。要移除一个模块，使用
+\texttt{rmmod\textbf{(1)}}命令。加载模块可以使用
+\texttt{modprobe\textbf{(1)}}或\texttt{insmod\textbf{(1)}}命令。其中，
+\texttt{modprob}更为安全，因为它解决了模块间的依赖关系。
+
+多数用户从来没有手工加载过模块。他们只使用内核自动加载器（the kernel
+autoloader）来管理模块。默认情况下，Slackware的内核中包括了
+\texttt{kmod}。\texttt{kmod}是一个内核选项，它使内核在需要时能自动加载
+所需的模块。想了解更多关于\texttt{kmod}及如何配置的内核，请参见
+\texttt{/usr/src/linux/Documentation/kmod.txt}\footnote{Slackware
+  13.37、内核2.6.37中已经找不到该文件。}。再次，前提是你已经安装了内核
+源码软件包，或者可以从\url{http://kernel.org}网站上下载内核源码。
+
+我们可以在上面涉及到的命令的相应man手册中找到更多信息，当然，还有
+\texttt{rc.modules}文件的相关内容。
+
+
+
+
+
+
+
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "../SlackGuide"
