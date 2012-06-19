@@ -2,8 +2,909 @@
 \chapter{网络配置}
 \label{chap:networkConfiguration}
 
-\section{NFS}
+\section{介绍：netconfig是我们的好朋友}
+\label{sec:networkConfiguration:netconfig}
+
+在我们安装Slackware的时候，setup程序就调用了\texttt{netconfig}命令。
+\texttt{netconfig}为我们提供如下的功能：
+\begin{itemize}
+\item 它会询问我们电脑的主机名及域名。
+\item 它会给出可用的各种地址方案并作简要说明，告诉我们什么情况下应该使
+  用什么方案，并询问根我们想使用什么方案来配置我们的网卡：
+  \begin{itemize}
+  \item Static-IP 静态IP地址
+  \item DHCP 动态IP地址
+  \item Loopback 回环地址
+  \end{itemize}
+\item 之后会为我们检测网卡并提示我们如何配置。
+\end{itemize}
+如果我们使用\texttt{netconfig}来配置LAN网络连接，它会解决近$80\%$的工
+作。我们强烈建议你在配置后再检查一下配置文件，原因如下：
+\begin{enumerate}
+\item 坚决不能信任一个安装程序，它不可能总是根据你的电脑做出合理的配置。
+  如果你使用的是一个安装程序，那么切记自己检查配置文件。
+\item 如果你还在学习Slackware或Linux管理，那么检查这些配置文件是很有帮
+  助的，至少你会知道配置文件长什么样。这也会帮助你在日后出现错误配置时
+  能及时解决问题。
+\end{enumerate}
+                                
+
+\section{网络硬件配置}
+\label{sec:networkConfiguration:hardware}
+如果你决定让你的Slackware连接到网络的话（这不是废话吗！），首先需要的
+是一张与Linux兼容的网卡。要小心确认网卡到底是不是与Linux兼容的（请查阅
+Linux文档计划\footnote{Linux Documentation Project}或内核文档，以获取
+当前准备使用的网卡支持情况）。一般而言，只要不是很老的内核，都会支持多
+得惊人的网卡。但就如上面所说，我们还是建议你在购买网卡之前，先查阅
+Linux硬件兼容清单（如GNU/Linux Beginners Group Hardware Compatiblity
+Links\footnote{\url{http://www.eskimo.com/\%7Elo/linux/hardwarelinks.html}}
+及Linux文档计划的HOWTO文档
+\footnote{\url{http://www.linux.org/docs/ldp/howto/hardware-HOWTO/}}），
+这些文档在网上都能找到。如果因为网卡不兼容，而花上几天甚至几星期来解决
+这个问题，那购买之前花一点时间在搜索上就很值得了。
+
+在你查阅相关文档时，最好同时记下支持某张网卡的对应模块。
+
+\subsection{加载网络模块}
+\label{sec:networkConfiguration:hardware:loadingModules}
+内核模块在是启动时由\path{/etc/rc.d}中的\path{/etc/rc.modules}加载
+的，也或者是通过\path{/etc/rc.d/rc.hotplug}自动加载的。默认的
+\texttt{rc.modules}文件中有一个小节是专门用于支持网络设备的。如果你手
+动查看该文件并阅读相关的代码，你会发现它首先检查\path{/etc/rc.d/}文
+件夹中的\texttt{rc.netdevice}文件是否存在并可执行。在setup程序安装系统
+时，如果自动检测到了你的网络设备，它就会自动创建该文件。
+
+在那个``if''语句下面是一堆注释了的语句，注明了网络设备的类型和相应的
+modprobe语句。找到与我们的设备对应的modprobe行并取消注释，保存文件即可。
+之后以\texttt{root}权限运行rc.modules就可以加载我们的网络设备的驱动了
+（当然还有那些没有注释的其它模块）。注意，其中的一些模块（如ne2000驱动）
+是需要参数的，请确保选择了正确的行。
+
+\subsection{LAN(10/100/1000Base-T and Base-2)卡}
+\label{sec:networkConfiguration:hardware:lan}
+这个标题涵盖了所有内置的PCI及ISA网卡。这些网卡是通过前一小节讲述的可加
+载的内核模块得到支持的。一般来说，\path{/sbin/netconfig}会自动检测你
+的网卡，并正确设置\texttt{rc.netdevice}文件。如果该步骤出错，最可能的
+情况就是为某张网卡加载的驱动是错误的（也不是没听说过，一些公司的同一个系
+列不同代的网卡需要不同的模块）。如果你确定网卡模块是对的，那么下个步骤
+最好是自己查看文档，看该模块在初始化时是否要加一些特定的参数。
+
+笔者注：在笔者的Slackware 13.37上，找不到rc.netdekvice文件，并且
+rc.modules也相应的网卡加载行，但网络正常使用。查阅相关资料，发现现在将
+常用的一些驱动编译进了内核，因此会自动加载。
+
+\subsection{调制解调器}
+\label{sec:networkConfiguration:hardware:modems}
+就像LAN卡一样，调制解调器也带有支持不同总线的选项。直到最近，多数的调
+制解调器还是8位或16们的ISA卡。由于Intel及motherboard公司不懈的努力，最
+终彻底消灭了ISA总线，现在我们能找到的调制解调器要么就是用串口或USB接口
+的外接调制解调器，要么就是内置的PCI调制解调器。如果你想为你的Linux配备
+调制解调器，那么事先考虑预算是很重要的。如果不算多数的话，那么可以说很
+多现在商店上的PCI调制解调器是WinModems。WinModems在自己的调制解调器卡
+上缺少一些基本的硬件：一些本应由这些硬件进行的运算就转移到了Windows上的
+调制解调器驱动及CPU上。这意味着在你尝试用它拨号到你的因特网服务提供商
+（internet Service Provider）时，PPPD会找不到标准的串口接口。
+
+如果你想确保所购买的调制解调器一定能用在Linux上，那么就买一个外接的调
+制解调器，并通过串口接到你的PC上。这能保证它会更好地工作，并在安装及维
+护时碰到的麻烦会少一些。但它需要外接的电源，而且一般更贵。
+
+有一些网站提供对基于WinModem设备的配置帮助。一些用户也说成功配置并安装
+了一些winmodem，包括Lucent、Conexant及Rockwell的芯片。由于支持这些设备
+的软件并不包含在Slackware中，并且不同的芯片要求不同的驱动，我们不对其
+进行详细描述。
+
+\subsection{PCMCIA}
+\label{sec:networkConfiguration:hardware:pcmcia}
+在Slackware安装过程中，我们可以选择安装pcmcia相关的软件包（在A系列中）。
+这些软件包提供了在Slackware下使用PCMCIA卡的一些软件及相关的设置文件。
+注意，pcmcia包只安装了一些使用PCMCIA卡的一般软件，并不安装任何驱动或模
+块。驱动和相应模块可以在\path{/lib/modules/`uname -r'/pcmcia}
+目录下找到。要找到适合我们网卡的PCMCIA模块可能要花上一些时间。
+
+我们需要修改\path{/etc/pcmcia/network.opts}（对于以太网网卡）或
+\path{/etc/pcmcia/wireless.opts}（无线网卡）。和其它的Slackware配置
+文件一样，这两个文件的注释也很清晰，所以作任何的修改也很容易。
+
+\section{TCP/IP设置}
+\label{sec:networkConfiguration:tcpIP}
+
+到本节为止，我们的网上应该安装完毕，相应的内核模块也加载完成了。我们还
+是上不了网，但我们可以使用命令\texttt{ifconfig -a}来得到网络设备的信息。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{ifconfig -a}
+eth0    Link encap:Ethernet HWaddr 00:A0:CC:3C:60:A4
+        UP BROADCAST NOTRAILERS RUNNING MULTICAST MTU:1500 Metric:1
+        RX packets:110081 errors:1 dropped:0 overruns:0 frame:0
+        TX packets:84931 errors:0 dropped:0 overruns:0 carrier:0
+        collisions:0 txqueuelen:100
+        RX bytes:114824506 (109.5 Mb) TX bytes:9337924 (8.9 Mb)
+        Interrupt:5 Base address:0x8400
+        
+lo      Link encap:Local Loopback
+        inet addr:127.0.0.1 Mask:255.0.0.0
+        UP LOOPBACK RUNNING MTU:16436 Metric:1
+        RX packets:2234 errors:0 dropped:0 overruns:0 frame:0
+        TX packets:2234 errors:0 dropped:0 overruns:0 carrier:0
+        collisions:0 txqueuelen:0
+        RX bytes:168758 (164.8 Kb) TX bytes:168758 (164.8 Kb)
+\end{Verbatim}
+
+如果我们只输入\path{/sbin/ifconfig}，而不加\texttt{-a}参数，那么就看
+不到\texttt{eth0}这个接口，原因是该接口还没有一个有效IP地址或路由地址。
+
+有许多不同的方法可以建立一个网络或加入一个子网络，但所有的方法可以大致
+归为两类：静态的和动态的。静态网络设置之后，每个网络节点（代表有IP地址
+的一些设备）都有固定的IP。动态网络设置之后，每个网络节点的IP地址都由一
+个叫作DHCP的服务器控制。
+
+\subsection{DHCP}
+\label{sec:networkConfiguration:tcpIP:dhcp}
+DHCP（或称为动态主机设置协议(Dynamic Host Configuration Protocol)），
+是一种由一台计算机为其它计算机分配IP的方法。在DHCP\textit{客户端}启动
+时，它会向本地局域网发送一个请求，查找是否存在DHCP\textit{服务器}来为
+自己分配一个IP地址。DHCP服务器中存储了一个有效的IP地址池以及相应的过期
+时间。当一个已经分配了的IP地址到期之后，客户端必须重新联系服务器并重复
+协议过程。
+
+该客户端在获取IP地址后会为对应的接口设置获取的IP地址。然而，DHCP客户端
+在与服务器协商IP时还会用个小``花招''，那就是它会记住之前使用的IP地址，
+并请求服务器为自己分配相同的IP地址。如果该IP可用，那么服务器会将该地址
+分配给客户端，若不可用，则会为其分配一个新的IP。所以协商过程示例如下：
+
+\begin{quote}
+  客户端：在局域网中有可用的DHCP服务器吗？\\
+  服务器：是的，我就是。\\
+  客户端：我需要一个IP地址。\\
+  服务器：你可以使用192.168.10.10这个地址，时限为19200秒。\\
+  客户端：谢谢。\\
+  \\
+  客户端：在局域网中有可用的DHCP服务器吗？\\
+  服务器：是的，我就是。\\
+  客户端：我需要一个IP，我们谈过的，之前我用的是192.168.10.10，我能再
+  用这个IP吗？\\
+  服务器：是的，可以。（或不行，但你可以使用192.168.10.12这个IP。）\\
+  客户端：谢谢。\\
+\end{quote}
+
+Linux中的DHCP客户端程序是\path{/sbin/dhcpcd}。如果你用自己喜欢的文本
+编辑器打开 \path{/etc/rc.d/rc.inet1} 文件，你会看到，该文中中间的部分
+调用了\path{/sbin/dhcpcd}命令。这会强制使用上面介绍的协商过程。
+\texttt{dhcpcd}还会记录当前IP剩余多少时间。并会在协议失效时自动重新发
+起连接，以获取新的IP地址。DHCP还能控制相关的信息，如使用哪个ntp服务器，
+使用哪个路由条目等。
+
+在Slackware中设备DHCP是很简单的，只要运行\texttt{netconfig}命令并选择
+DHCP方式即可，如果你有不只一个NIC并且不想用DHCP对\texttt{eth0}进行设置，
+那么只要手工打开\path{/etc/rc.d/rc.inet1.conf} 文件，并将相应的代表
+NIC的变量改为``\texttt{YES}''即可。
+
+
+\subsection{静态IP}
+\label{sec:networkConfiguration:tcpIP:staticIP}
+静态IP就是一个固定的地址，除非手工指定，这个地址不会改变。这种方法适用
+于管理员不希望IP信息变化的情况，如对于一个LAN（局域网）中的内部服务器，
+或所有连接到因特网的服务器，以及网络中的路由器。使用静态IP分配方法，只
+要为一台机器分配了IP，之后就可以不管了，其它的机器也会知道自己要一直使
+用这个IP，并且一直使用该IP地址与服务器联系。
+
+\subsection{/etc/rc.d/rc.inet1.conf}
+\label{sec:networkConfiguration:tcpIP:inet1.conf}
+如果想为新安装的Slackware分配IP地址，要么可以使用\texttt{netconfig}脚
+本，要么可以手动修改\path{/etc/rc.d/rc.inet1.conf}文件。在
+\path{/etc/rc.inet1.conf}文件中，你会看到如下的内容：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# Primary network interface card (eth0)
+IPADDR[0]=""
+NETMASK[0]=""
+USE_DHCP[0]=""
+DHCP_HOSTNAME[0]=""
+\end{Verbatim}
+之后在文件末尾中可以看到：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+GATEWAY=""
+\end{Verbatim}
+本例中，我们所有的任务就是为这些变量赋值，即在引号中填上正确的值。这些
+变量会在启动时由\path{/etc/rc.d/rc.inet1}脚本调用来对网卡进行配置。对
+于每个NIC（network interface card——网络接口卡），只要输入正确的IP地址，
+或者在\texttt{USE\_DHCP}变量栏中填上``YES''。Slackware会按照该文件中NIC
+信息的位置来启动相应的NIC。
+
+\texttt{DEFAULT\_GW}变量用来为Slackware设置默认网关地址。在只有一个路由
+的情况下，所有本机与因特网的信息交流都是通过这个网关进行的。如果使用的
+是DHCP，那该行就不需要填写，因为DHCP会为你指定使用哪个网关。
+
+\subsection{/etc/resolv.conf}
+\label{sec:networkConfiguration:tcpIP:resolv.conf}
+好了，现在我们已经设置好了IP地址，默认网关也设置了，你可能有几百万美元
+（可以考虑分我们一点），但还是不能将域名解析为IP地址。没有人想输入
+\url{72.9.234.112}来打开\url{http://www.slackbook.org}。毕竟，除了作者
+还有谁会记得这些IP地址呢？所以我们需要设置DNS，但应该怎么做呢？那就要
+用到\path{/etc/resolv.conf} 文件了。
+
+有可能在你的\path{/etc/resolv.conf} 文件中已经有了正确的信息。如果你使
+用DHCP来设置你的网络，DHCP服务器会为你更新这个文件（技术上来说，它只是
+告诉\texttt{dhcpcd}应该在这个文件中填写什么内容，\texttt{dhcpcd}照做而
+已）。如果你想手工修改该文件，那么请参照下面这个例子：
+
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{ca /etc/resolv.conf}
+nameserver 192.168.1.254
+search lizella.net
+\end{Verbatim}
+
+第一行很简单。nameserver关键字只是告诉我们应该查询哪个DNS服务器。这行
+中填写的必须是IP地址。但你想写多少行就可以写多少行。Slackware会按顺序
+逐个查询，直到找到一个匹配的为止。
+
+第二行就有点意思了。search 关键词的作用是列出一个域名列表，在我们搜索
+DNS服务器时，会假定是这些域名下的子域名。这就使得我们只使用一个域
+名的FQDN（完整的符合条件的域名）的前面部分就能访问一个域名。例如，如果
+``slackware.com''在搜索列表中，我们可以只输入\url{http://store}，就可
+以访问\url{http://store.slackware.com}
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{ping -c 1 store}
+PING store.slackware.com (69.50.233.153): 56 data bytes
+64 bytes from 69.50.233.153 : icmp_seq=0 ttl=64 time=0.251 ms
+1 packets transmitted, 1 packets received, 0\% packet loss
+round-trip min/avg/max = 0.251/0.251/0.251 ms
+\end{Verbatim}
+
+
+\subsection{/etc/hosts}
+\label{sec:networkConfiguration:tcpIP:hosts}
+现在我们的DNS也正常工作了。如果我们想跳过DNS服务器，或是为一个不存在于
+DNS服务器上的机器添加一个DNS条目，应该怎么做？Slackware 中包含了一个倍
+受喜爱的文件\path{/etc/hosts}，它相关于本地的DNS服务器，其中包含了一个
+列表，每个列表都由域名和相应的IP地址构成。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{cat /etc/hosts}
+127.0.0.1              localhost locahost.localdomain
+192.168.1.101          redtail
+172.14.66.32           foobar.slackware.com
+\end{Verbatim}
+本例中，我们可以看到域名localhost对应着IP地址
+\href{http://127.0.0.1}{127.0.0.1}（该IP总是为localhost保留），域名
+redtail对应IP\href{http://192.168.1.101}{192.168.1.101}，而域名
+\href{http://foobar.slackware.com}{foobar.slackware.com}对应的IP则为
+\href{http://172.14.66.32}{172.14.66.32}。
+
+\section{PPP}
+\label{sec:networkConfiguration:ppp}
+一些人仍然使用某种拨号连接来连网。尽管偶尔也有用SLIP的，最常用的方法就
+是PPP。配置PPP来连接远程服务器是相当容易的。我们可以使用下面几种程序来
+帮助我们进行设置。
+
+请注意：PPP与现在常用的PPPoE是两个不同的概念。这里暂时不打算详细介绍其
+中的区别。%TODO:PPP与PPPoE的区别
+
+\subsection{pppsetup}
+\label{sec:networkConfiguration:ppp:pppsetup}
+Slackware提供了一个命名\texttt{pppsetup}的程序来对系统的拨号帐号进行设
+置，它的外观与\texttt{netconfig}很像。运行该程序需要\texttt{root}权限。
+之后只需要输入\texttt{pppsetup}即可。
+
+这个程序会提出一系列问题，我们需要正确回答每一个问题。如我们的调制解调
+器设备，调制解调器初始化字串及ISP的电话号码。其中的一些问题有默认的答
+案，这些问题通常选择默认即可。
+
+这个程序运行结束后，会创建\texttt{ppp-go}及\texttt{ppp-off}程序。它们
+的作用分别是启动和结束PPP连接。这两个程序位于\path{/usr/bin}文件夹内，
+并且需要\texttt{root}权限才能运行。
+
+\subsection{/etc/ppp}
+\label{sec:networkConfiguration:ppp:ppp}
+对于绝大多数用户来说，只要运行\texttt{pppsetup}就足够了。然而，在一些
+情况下我们可能想设置一些PPP守护进程用到的值。所有的配置信息都保存在
+\path{/etc/ppp}文件夹下。下面是该文件夹中的一些文件及相应的功能：
+
+\begin{description}
+\item[ip-down] PPP连接结束后\texttt{pppd}执行的脚本。
+\item[ip-up] 当ppp连接成功后，\texttt{ppp}执行的脚本。可以把想在建立连
+  接后运行的命令写在该文件中。
+\item[options] 包含一般的\texttt{pppd}的配置选项。
+\item[options.demand] 在\texttt{pppd}运行在请求模式下的一般配置选项。
+\item[pppscript] 包含发送给调制解调器的命令。
+\item[pppsetup.txt] 一个日志文件，记录了运行\texttt{pppsetup}时的所有
+  输入。
+\end{description}
+注意，这些文件在没有运行\texttt{pppsetup}之前可能是不存在的。
+
+\section{PPPoE}
+\label{sec:networkConfiguration:pppoe}
+PPPoE（全称Point-to-Ppoint Protocol over Ethernet，直译为以太网上的点
+对点协议）可以使以太网的主机通过一个简单的桥接设备连接到一个远端的集中
+器上。通过PPPoE协议，远端接入设备能实现对每个用户的控制和计费。由于
+PPPoE具有较高的性价比，它在包括小区组网建设等一系列应用中被广泛采用。
+目录流行的宽带接入方式ADSL就使用了PPPoE协议。如果您是使用路由连接ADSL
+的，那么路由一般自带拨号功能，就不需要在主机上设置了，反之则需要设置
+PPPoE来进行连网。
+
+Slackware中对PPPoE的支持是由rp-pppoe软件包提供的。它提供了三个主要的命
+令：\texttt{pppoe-setup}用来设置拨号信息，\texttt{pppoe-start}用来虚拟
+拨号，而相应地\texttt{pppoe-stop}的作用就是断开连接。
+
+\subsection{pppoe-setup}
+\label{sec:networkConfiguration:pppoe:pppoesetup}
+
+pppoe-setup是一个脚本文件，运行之后会向用户提出一些问题，之后会将用户
+的答案转换成配置文件，保存在\path{/etc/ppp/pppoe.conf}文件中。运行
+\texttt{pppoe-setup}命令的显示如下：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{pppoe-setup}
+Welcome to the Roaring Penguin PPPoE client setup.  First, I will run
+some checks on your system to make sure the PPPoE client is installed
+properly...
+
+Looks good!  Now, please enter some information:
+
+USER NAME
+
+>>> Enter your PPPoE user name (default bxxxnxnx@sympatico.ca):
+\end{Verbatim}
+首先是填写我们的上网帐号。
+
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+INTERFACE
+
+>>> Enter the Ethernet interface connected to the DSL modem
+For Solaris, this is likely to be something like /dev/hme0.
+For Linux, it will be ethn, where 'n' is a number.
+(default eth0): 
+\end{Verbatim}
+这个步骤是选择连接到DSL的网卡，Linux下，网卡的形式为``ethn''，其中n为网卡
+的编号（可以通过\texttt{ifconfig}查看）。默认为第一张网卡。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+Do you want the link to come up on demand, or stay up continuously?
+If you want it to come up on demand, enter the idle time in seconds
+after which the link should be dropped.  If you want the link to
+stay up permanently, enter 'no' (two letters, lower-case.)
+NOTE: Demand-activated links do not interact well with dynamic IP
+addresses.  You may have some problems with demand-activated links.
+>>> Enter the demand value (default no): 
+\end{Verbatim}
+接下来的内容是选择是否只在需要时进行连接，如果选择``no''，代表连接后
+一直保持连接，如果希望只在需要时进行连接，则以秒为单位输入断开连接的时
+间，例如输入5s，则如果5s内没有用到连接，则自动将连接断开。默认为``no''，
+即一直保持连接。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+DNS
+
+Please enter the IP address of your ISP's primary DNS server.
+If your ISP claims that 'the server will provide DNS addresses',
+enter 'server' (all lower-case) here.
+If you just press enter, I will assume you know what you are
+doing and not modify your DNS setup.
+>>> Enter the DNS information here:\textbf{server}
+\end{Verbatim}
+本步骤是填写ISP（Internet Service Provider，直译为因特网服务提供商）的
+DNS，如果ISP声称由服务器提供DNS，则此处填写server即可。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+PASSWORD
+
+>>> Please enter your PPPoE password:    
+>>> Please re-enter your PPPoE password:
+\end{Verbatim}
+此步骤输入密码。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+FIREWALLING
+
+Please choose the firewall rules to use.  Note that these rules are
+very basic.  You are strongly encouraged to use a more sophisticated
+firewall setup; however, these will provide basic security.  If you
+are running any servers on your machine, you must choose 'NONE' and
+set up firewalling yourself.  Otherwise, the firewall rules will deny
+access to all standard servers like Web, e-mail, ftp, etc.  If you
+are using SSH, the rules will block outgoing SSH connections which
+allocate a privileged source port.
+
+The firewall choices are:
+0 - NONE: This script will not set any firewall rules.  You are responsible
+          for ensuring the security of your machine.  You are STRONGLY
+          recommended to use some kind of firewall rules.
+1 - STANDALONE: Appropriate for a basic stand-alone web-surfing workstation
+2 - MASQUERADE: Appropriate for a machine acting as an Internet gateway
+                for a LAN
+>>> Choose a type of firewall (0-2):\textbf{1} 
+\end{Verbatim}
+选择防火墙的规则，0表示不使用防火墙，规则1则适合于一台机器上网的情况，
+规则2则适用于作为网关连接上网的机器。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+** Summary of what you entered **
+
+Ethernet Interface: eth0
+User name:          bxxxnxnx@sympatico.ca
+Activate-on-demand: No
+DNS addresses:      Supplied by ISP's server
+Firewalling:        NONE
+
+>>> Accept these settings and adjust configuration files (y/n)?\textbf{y}
+\end{Verbatim}
+最后是对刚才回答的信息的一个总结，并寻问是否保存，保存即可。
+
+至此，对PPPoE的配置就完成了。之后只需要使用\texttt{pppoe-start}就可拨
+号上网，使用\texttt{pppoe-stop}即可断开连接。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{pppoe-start}
+. Connected!
+# \textbf{pppoe-stop}
+Killing pppd (27230)
+Killing pppoe-connect (27213)
+\end{Verbatim}
+
+\section{无线网络}
+\label{sec:networkConfiguration:wireless}
+在Slackbook 2.0的年代，无线网络还是相对较新的东西，但随着笔记本
+的流行，越来越多人使用无线网络，且由于无线网络不需要传统的双绞线等有线
+设备，不会占用太多的物理空间，因而越来越流行，现在，无线网络几乎是无所
+不在了。不幸的是，Linux对于无线网的支持并不像传统有线网那么强劲。
+
+我们将先介绍无线网络配置的三个步骤，之后再对无线网络的相关内容进行更深
+入的介绍。如果你只是想快速使用无线网络，可以考虑先看第
+\ref{sec:networkConfiguration:wireless:details:wicd}节中
+\texttt{wicd}的相关内容。
+
+\subsection{无线网络配置步骤}
+\label{sec:networkConfiguration:wireless:setup}
+
+配置一块802.11的无线以太网网卡需要三个基本步骤：
+\begin{enumerate}
+\item 为无线网卡添加硬件支持。
+\item 将无线网卡连接到一个无线接入点。
+\item 配置该无线网络。
+\end{enumerate}
+
+\subsubsection{硬件支持}
+\label{sec:networkConfiguration:wireless:setup:hardwareSupport}
+无线网卡的支持是通过内核实现的，要么编译成一个模块，要么直接编译进入内
+核。一般地，最新的以太网网卡都是通过内核模块支持的，所以我们需要决定使
+用哪个内核模块并通过\path{/etc/rc.d/rc.modules}加载。
+\texttt{netconfig}可能检测不了无线网卡，所以你可能需要自己对无线网卡进
+行设置。请参见
+\url{http://www.hpl.hp.com/personal/Jean_Torrilhes/Linux/}，其中包含了
+对无线网卡的驱动支持的相关信息。
+
+\subsubsection{配置无线网卡}
+\label{sec:networkConfiguration:wireless:setup:configWireless}
+大部分的工作都是通过\texttt{iwconfig}命令完成的，所以如果你想了解更多
+的信息，可以查阅\texttt{iwconfig}的man手册页。
+
+首先，我们需要设置网卡的无线接入点。就术语“无线接入点”而言，它本身的
+含义就有很大的不同，而在对无线接入点的配置上也有一些不同，所以我们需要
+对网卡有一定的了解才能做出合适的配置。一般而言，至少需要知道下面的信息：
+\begin{itemize}
+\item 区域ID，或称为准备接入的网络名称（\texttt{iwconfig}中的ESSID）。
+\item WAP使用的信道（channel）。
+\item 加密设置，包括可能用到的密码（最好是十六进制的）。
+\end{itemize}
+
+\begin{quote}
+  \textbf{注意：}一个关于WEP的注记。WEP缺陷很大，只要有它的足够的包就
+  可以破解出密码。但也聊胜于无。如果你希望无线网络有更强的安全性，那么
+  你应该看看VPN或IPSec等知识，它们都超出了本书的范围。你也可以设置无线
+  网，让它不对外广播它的ESSID。对无线网管理方针的全面讨论超出了本节的
+  范围，你可以用Google搜索相关内容。
+  \\
+  笔者注：WEP由于安全性问题已经不再推荐使用，现在的无线网一般使用WPA进
+  行加密，以达到较好的效果。
+\end{quote}
+
+一旦得到足够的信息，并假设已经使用\texttt{modprobe}为无线网卡载入了正
+确的驱动，就可以开始修改\path{rc.wireless.conf}文件添加我们的设置了。
+\path{rc.wireless.conf}文件有些杂乱无章，我们最少要对其中的ESSID、KEY、
+及CHANNEL（如果网卡需要的话）项进行修改。（可以尝试不设置CHANNEL，如果
+网卡正常工作，那么好吧；如果不能工作，那么设置合适的CHANNEL即可。）如
+果你够胆，可以只设置需要乃至的变量。\path{rc.wireless.conf}文件中的变
+量名对应了\texttt{iwconfig}的各项参数。\path{rc.wireless}会读取该文件
+并使用这些参数正确调用\texttt{iwconfig}命令。
+
+如果你的密钥是十六进制的，那是最好的，因为这样方便使用WAP及
+\texttt{iwconfig}直接使用。如果你只有一串字符串，那么就不能确定WAP是如
+何将其转换成十六进制的密钥了。这种情况下就要猜测WAP的加密方式了（或者
+直接得到十六进制的密钥）。
+
+在修改完\path{rc.wireless.conf}文件后，以\texttt{root}权限运行
+\path{rc.wireless}，之后再以\texttt{root}权限运行\path{rc.inet1}就可以
+了。我们可以使用一些传统的工具如\texttt{ping}来测试无线网络，当然，也
+可以用\texttt{iwconfig}进行测试。在测试无线网络时，如果你同时还有有线
+网卡，那么应该用\texttt{ifconfig}把它们关了，防止干扰。我们也可以通过
+重启系统来测试我们的修改是否成功。
+
+现在我们已经知道如何通过修改\path{/etc/rc.d/rc.wireless}来配置默认的网
+络，现在让我们仔细研究iwconfig的工作方式。我们能学会一种快速建立无线网
+络的方法，这种方法我们不推荐，但如果我们在诸如网吧、咖啡厅或其它一些有无
+线热点覆盖的地方时，这种方法能帮助我们快速连网。
+
+第一个步骤是告诉我们的无线网卡该连哪个网。记得我们的例子里采用的是
+``wlan0''这个网卡，你在使用时要用自己的网卡来替换。并将``mynetwork''换
+成你想连到的网络的ESSID。好吗，我知道你知道……之后要做的就是输入无线
+网的密码（如果设置了的话）。最后指定要使用的信道（如果需要的话）。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{iwconfig wlan0 essid "mynetwork"}
+# \textbf{iwconfig wlan0 key XXXXXXXXXXXXXXXXXXXXXXXXXXX}
+# \textbf{iwconfig wlan0 channel n}
+\end{Verbatim}
+这应该就是无线网络涉及到的内容。
+
+\subsubsection{设置网络}
+\label{sec:networkConfiguration:wireless:setup:configNetwork}
+这个步骤就是设置如DNS或host一类的事，请参见之前第
+\ref{sec:networkConfiguration:tcpIP:staticIP}节中有线网络的相关内容。
+
+\subsection{深入了解无线网络}
+\label{sec:networkConfiguration:wireless:details}
+上一节中，我们对如何配置无线网络有了一个简要的介绍，知道这些知识还不够，
+下面我们会对无线网络常用到的知识进行介绍。
+
+首先更详细介绍命令\texttt{iwconfig}的用法，接着介绍WEP和WPA加密算法，
+之后再讨论\path{rc.inet1.conf}在配置无线网络中的使用，最后再介绍一个常
+用的无线网络配置工具——wicd。
+
+\subsubsection{iwconfig}
+\label{sec:networkConfiguration:wireless:details:iwconfig}
+无线网络比传统的有线网络更为复杂，因此需要额外的配置工具。Slackware中
+包含了多种多样的无线网络工具集，使用它们我们就能对无线网络接口卡
+（WNIC，简称无线网卡）在最基础的层次上进行配置了。这里并不涵盖所有的内
+容，而是教会你一些基础知识，让你能进行快速地配置。这里要介绍的就是
+\texttt{iwconfig\textbf{(1)}}命令。在不加任何参数的情况下，它默认显示
+我们计算机上所有网卡的无线信息。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar:~# \textbf{iwconfig}
+lo        no wireless extensions.
+
+eth0      no wireless extensions.
+
+wmaster0  no wireless extensions.
+
+wlan0     IEEE 802.11abgn  ESSID:"nest"  
+          Mode:Managed  Frequency:2.432 GHz  Access Point:
+00:13:10:EA:4E:BD   
+          Bit Rate=54 Mb/s   Tx-Power=17 dBm   
+          Retry min limit:7   RTS thr:off   Fragment thr=2352 B   
+          Encryption key:off
+          Power Management:off
+          Link Quality=100/100  Signal level:-42 dBm  
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+tun0      no wireless extensions.
+\end{Verbatim}
+
+与有线网络不同的是，无线网络是``模糊的''。网络的边界是不确定的，不同的
+网络可能互相覆盖。为了防止产生混乱，每个无线网卡（还好）有唯一的标识符。
+最基本的两个标识符就是ESSID（全称为Extended Service Set Identifier，直
+译为扩展服务集标识符），以及信道或称作无线传输频率。ESSID就是用来标识我
+们要连接到的无线网的名字；我们也称为网络名或一些类似的名称。典型的无线
+网络是在11个不同频率下工作的。即使我们想连接到最基本的无线网络，在诸如
+设置无线网卡的IP地址之前，我们需要知道这两个信息，当然，可能还需要其它信
+息。
+
+在上面的例子中，可以看到，我们ESSID设置为``nest''，而我们笔记本是在
+2.432GHz频率下进行无线传输的。只是连接到一个未加密的无线局域网的话，只
+要知道这两个信息就足够了。（如果你想来我家使用我家的未加密的无线网，要
+知道，在接入点允许你与我们LAN通信之前，你要破解一个2048位的SSL密
+钥。-\_-!）
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar:~# \textbf{iwconfig wlan0 essid nest freq 2.432G}
+\end{Verbatim}
+[freq]参数和[channel]本质上是一个东西。只要设置其中的一个就可以了。如
+果你不知道应该设置哪个频率或信道，Slackware一般能为你自动设置。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar:~# iwconfig wlan0 essid nest channel auto 
+\end{Verbatim}
+
+使用了auto参数，无论ESSID为``nest''的网络使用哪个频率，Slackware都会尝
+试连接到信号最强的那个频率。
+
+\texttt{iwconfig}的另外一些参数会在下面几个小节中介绍。
+
+\subsubsection{WEP}
+\label{sec:networkConfiguration:wireless:details:wep}
+很显然，无线网络的安全性不如有线网络，将数据在空中传输，使得数据容易被第
+三方拦截。所以过了这么多年，我们开发了很多方法来增强无线网络的安全性。
+第一种方法名为Wired Equivilant Protection（直译为等价有线保护），或简
+称为WEP，但该方法与目标相去甚远。如果你现在还在使用WEP，那么我们建议你
+使用WPA2或其它保护能力更强的措施。对WEP的攻击很平常，一般只要几分钟就
+能完成。不幸的是，现在还有一些接入点是须采用WEP加密的。
+
+我们有时也会需要连接到这样的网络。连接到一个以WEP加密的接入点是很容易
+的，尤其是如果知道加密后的十六进制密钥。如果知道十六进制的密钥，只要直
+接使用[key]参数加上密钥即可，如果只知道ASCII码的密钥，那么输入密钥时要
+加上前置的``s:''；下面就是几个例子。一般来说，人们倾向于用十六进制的。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar:~# iwconfig wlan0 key cf80baf8bf01a160de540bfb1c
+darkstar:~# iwconfig wlan0 key s:thisisapassword
+\end{Verbatim}
+
+\subsubsection{WPA}
+\label{sec:networkConfiguration:wireless:details:wpa}
+Wifi Protected Access（缩写为WPA，直译为wifi访问保护）是WEP的继承人，
+它的目标是修复无线加密中存在的几个问题。不幸的是，WPA本身也有一些缺陷。
+更新后的WPA2提供更强大的保护措施。就当前而言，几乎所有的网卡及接入点都
+支持WPA2，但仍有一些老的设备只支持WEP。如果你需要对你的网络通信进行加
+密，那么WPA2只能说提供了最基本的保护。不幸的是，iwconfig本身无法设置
+WPA2。因此，我们需要一个助手程序\texttt{wpa\_supplicant\textbf{(8)}}。
+
+更悲剧的是，只能手工配置一个用WPA2进行保护的网络；我们必需直接在文本编
+辑中编辑\path{/etc/wpa\_supplicant.conf}文件。这里我们只讨论最简单的
+WPA2保护类型，Pre-Shared Key（直译为预先分享密钥）或简称为PSK。如果需
+要配置Slackware以连接到更复杂的WPA2加密网络，请参见
+\path{wpa\_supplicant.conf}的man手册。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# /etc/wpa\_supplicant.conf
+# ========================
+# This line enables the use of wpa\_cli which is used by rc.wireless
+# if possible (to check for successful association)
+ctrl\_interface=/var/run/wpa\_supplicant
+# By default, only root (group 0) may use wpa\_cli
+ctrl\_interface\_group=0
+eapol\_version=1
+ap\_scan=1
+fast\_reauth=1
+#country=US
+
+# WPA protected network, supply your own ESSID and WPAPSK here:
+network={
+  scan\_ssid=1
+  ssid="nest"
+  key_mgmt=WPA-PSK
+  psk="secret passphrase"
+}
+\end{Verbatim}
+我们感兴趣的是network括进来的这一块。本例中，我们要连接到的ESSID为
+``nest''，同时PSK使用``secret passphrase''。设置就完成了。现在我们可以
+运行wpa\_supplicant并使用DHCP获取IP或手动设置静态IP。当然，这还是很麻烦，
+应该要用个更简单的方法。
+
+\subsubsection{再读rc.inet1.conf}
+\label{sec:networkConfiguration:wireless:details:inet1}
+欢迎重回\path{rc.inet1.conf}。记得之前我们就是通过这个文件来设置有线网
+络的。现在，我们要用该文件来设置wifi网络。然而，如果你使用的是WPA2，还
+是需要先正确设置\path{wpa_supplicant.conf}文件。
+
+还记得吗？每张网卡都有与其对应的标识符变量。对于wifi网卡也是一样的，只
+不过因为无线网络更复杂，所以变量也更多。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# rc.inet1.conf (excert)
+# ======================
+## Example config information for wlan0.  Uncomment the lines you need and fill
+## in your info.  (You may not need all of these for your wireless network)
+IFNAME[4]="wlan0"
+IPADDR[4]=""
+NETMASK[4]=""
+USE\_DHCP[4]="yes"
+#DHCP\_HOSTNAME[4]="icculus-wireless"
+#DHCP\_KEEPRESOLV[4]="yes"
+#DHCP\_KEEPNTP[4]="yes"
+#DHCP\_KEEPGW[4]="yes"
+#DHCP\_IPADDR[4]=""
+WLAN\_ESSID[4]="nest"
+#WLAN\_MODE[4]=Managed
+#WLAN\_RATE[4]="54M auto"
+#WLAN\_CHANNEL[4]="auto"
+#WLAN\_KEY[4]="D5AD1F04ACF048EC2D0B1C80C7"
+#WLAN\_IWPRIV[4]="set AuthMode=WPAPSK | \textbackslash{}
+#   set EncrypType=TKIP | \textbackslash{}
+#   set WPAPSK=96389dc66eaf7e6efd5b5523ae43c7925ff4df2f8b7099495192d44a774fda16"
+WLAN\_WPA[4]="wpa\_supplicant"
+#WLAN\_WPADRIVER[4]="ndiswrapper"
+\end{Verbatim}
+我们讨论有线网络的时候，用ethn表示网卡，每个n对应一张网卡。这里就不一
+样了。注意到变量IFNAME[4]的值为``wlan0''。无线网卡的名字可能不是
+``ethn''类型的，这里就是一个例子。当启动脚本读取\path{rc.inet1.conf}时，
+Slackware就知道将这些选项应用到``wlan0''这张无线网卡上，而不是eth4这张
+有线网卡（你机子上大概也不存在这张网卡）。别的一些选项和有线的配置类似。
+IP地址信息和有线网络的设置一模一样。但还有些变量需要解释一下的。
+
+第一个就是WLAN\_ESSID[n]及WLAN\_CHANNEL[n]变量，当然，阅读完之前的内容
+后只要看名字就知道干什么用的了，它们代表了要连接的ESSID和相应的信道。
+WLAN\_MODE[n]的值可以是``managed''或``ad-hoc''。如果是连接到一个接入点
+（可以理解为要连到其它网）的话，就选择managed模式，如果使用的是WEP加密
+的话，WLAN\_KEY[n]是要使用的WEP密钥。WLAN\_IWPRIV[n]是个很复杂的变量，
+它在变量的值中设置其它变量。WLAN\_IWPRIV[n]是用于WPA2网络中的。在这个
+变量中，要告诉Slackware用什么样的认证模式、加密类型及WPA2的密钥。请注
+意，WLAN\_KEY[n]变量与WLAN\_IWPRIV[n]变量是相互排斥的，我们不能在同一
+个接口上同时使用两个变量。如果你正确地配置完这些变量后，Slackware就是
+会系统启动时尝试为你连接到无线网络上。
+
+但等等，还是好麻烦啊！而且如果我想连到不止一个无线网络上呢？例如我会带
+笔记本到去学校，回家，我需要在不同范围的时候自动连上不同的网。用这里讲
+的方法是不是太麻烦了啊！是的，的确如此。
+
+\subsubsection{wicd}
+\label{sec:networkConfiguration:wireless:details:wicd}
+接下来介绍\texttt{wicd\textbf{(8)}}，它是那些抱着笔记本到处跑的人们配
+置有线或无线网络的首选管理器。正确的发音为``wicked''。wicd能保存任意数
+量的无线网络连接信息，且在指点之间或只运行一个简单的命令就是能连接到对
+应的网络。Slackware默认不安装wicd。因此它多少会对正常的配置方法有影响。
+但你可以在Slacwkare DVD或FTP上的\path{/extra}目录下找到wicd的安装包。
+wicd不仅是一个网络连接守护进程，同时提供了一个配置网络的图形界面。当然，
+也提供了在文本终端下的配置界面，\texttt{wicd-curses\textbf{(8)}}几乎和
+传统的GTK前端一样强大。要使用wicd，我们首先要把在\texttt{rc.inet1.conf}中
+的所有设置清空。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# rc.inet1.conf
+# =============
+# Config information for eth0:
+IPADDR[0]=""
+NETMASK[0]=""
+USE\_DHCP[0]="no"
+DHCP\_HOSTNAME[0]=""
+# Default gateway IP address:
+GATEWAY=""
+\end{Verbatim}
+现在我们可以安装wicd了，设置守护进程开机启动，之后就可以用这个更友好的
+程序了。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar:~# \textbf{installpkg /path/to/extra/wicd/wicd-1.6.2.1-1.txz}
+darkstar:~# \textbf{chmod +x /etc/rc.d/rc.wicd}
+darkstar:~# \textbf{/etc/rc.d/rc.wicd start}
+\end{Verbatim}
+如果你主要使用的是文本终端，那么可以从终端中运行wicd-curses。相反，如
+果你一般使用的是X提供的图形桌面，那么可以从KDE或XFCE菜单中启动wicd的图
+形前端。还有一种方法，就是在虚拟终端或run对话框中运行\texttt{wicd-client\textbf{(1)}}。
+
+%TODO: add pictures of wicd-curses and wicd-clinet.
+
+\section{网络文件系统}
 \label{sec:networkConfiguration:networkFileSystem}
+现在，我们的网络能正常工作了。我们可以ping到内网的主机，并且如果网关设
+置正确的话，我们也能ping到因特网上的计算机了。正如我们知道的一样，将一
+台电脑连接到网络，目的就是能通过网络访问该电脑，当然也有人连网只是觉得
+好玩，但大多数人的目的是共享文件或打印机。他们希望能访问因特网上的文件
+或是玩一些连网的游戏。安装TCP/IP并使它正常工作是达成这一目标的一个途径，
+但这只是最基础的步骤。要想共享文件，我们还需要使用FTP或SCP进行来回传输。
+在新安装的Slackware上，我们并不能像使用Windows时，点击“网上邻居”就可
+以的。我们希望与其它的Unix机器无缝地共享文件。
+
+幸运的是，我们可以使用\textit{网络文件系统}技术，这样访问其它机器上的
+文件也是透明的了。在使用这些软件访问其它机器上的文件时，我们并不需要知
+道一个文件存在哪个机器上，只要知道它存在及如何访问它就可以了。之后管理
+如何通过可用的文件系统及网络文件系统来使用户访问该文件，就归操作系统管
+了。最常用的两种网络文件系统是SMB（通过Samba实现）及NFS。
+
+\subsection{SMB/Samba/CIFS}
+\label{sec:networkConfiguration:networkFileSystem:samba}
+SMB（全称为Server Message Block，直译为服务器信息块）是一个古老的
+NetBIOS协议，最早由IBM为其局域网管理工具使用。微软一直对NetBIOS及其衍
+生物感兴趣（NetBEUI，SMB及CIFS）。Samba项目早在1991年就存在了，当时有
+用来将运行NetBIOS的IBM PC连接到一个Unix服务器上。而现在，由于Windows的
+支持，几乎整个文明世界的人们都倾向于使用SMB来在网络上共享文件及打印服
+务。
+
+Samba的配置文件是是\path{/etc/samba/smb.conf}；该文件的注释良好，文档
+齐全。并且系统已经创建了一个样例，我们可以通过查看和修改该样例来创建一
+个满足我们需要的配置文件。如果你想要更为精细的控制，那么smb.conf的man
+手册是不可获缺的。由于Samba的文档是如此之好，并且可以在我们上面提到的
+位置找到，所以我们不再详述文档，取而代之的是，我们将对基础的一些方面，
+做一个快速而简单的介绍。
+
+\path{smb.conf}文件分为好几节：一个共享内容占一小节，加上一个全局的小
+节用来设置一些全局使用的选项。有一些选项只能用在全局小节中；而另一些变
+量只能在非全局小节中使用；而全局的选项会被每个内容小节中的选项覆盖。记
+得自己翻翻man手册。
+
+我们希望通过修改\path{smb.conf}文件来在局域网中共享文件，我们建议你修
+改下面列出的选项。
+
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+[global]
+# workgroup = NT-Domain-Name or Workgroup-Name, eg: LINUX2
+workgroup = MYGROUP
+\end{Verbatim}
+
+修改工作组名，只要填上你在本地使用的工作组或域名即可。
+
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# server string is the equivalent of the NT Description field.
+server string = Samba Server
+\end{Verbatim}
+这个选项代表我们的Slackware的机器名，这个机器名就是在Windows的“网上邻
+居”中显示的机器名。
+
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# Security mode. Defines in which mode Samba will operate. Possible 
+# values are share, user, server, domain and ads. Most people will want 
+# user level security. See the Samba-HOWTO-Collection for details.
+   security = user
+\end{Verbatim}
+安全模式，我们一般选择user级别就可以了。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# You may wish to use password encryption. Please read
+# ENCRYPTION.txt, Win95.txt and WinNT.txt in the Samba
+# documentation.
+# Do not enable this option unless you have read those documents
+encrypt passwords = yes
+\end{Verbatim}
+如果encrypt passowrds选项没有开启，那么就不能使用Samba与NT4.0、Win2k、
+WinXP及Win2003等平台共享。更早的Windows版本则不需要加密就能共享文件。
+
+注：Slackware 13.37中的samba-3.5.10的sample文件中是没有这个选项的。原
+因是已经默认开启了encrypt password，且由于现在NT4.0以前的版本几乎没人
+用，所以也没有必要将该选项关闭。
+
+SMB是一个认证式的协议，也就是在使用该服务时要提供正确的用户名及密码。
+我们将使用\texttt{smbpasswd}命令来告诉samba服务器哪些用户名及密码是有
+效的。\texttt{smbpasswd}有一些选项来告诉自己是添加一个传统意义上的用户
+还是添加一个机器用户（SMB在添加机器用户时，要求使用该计算机的NETBIOS名
+作为用户名，以此来限制用户能认证的计算机）。
+
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+Adding a user to the \textit{/etc/samba/private/smbpasswd} file
+添加一个普通用户，用户名为user，保存在/etc/samba/private/smbpasswd文件中。
+# \textbf{smbpasswd -a user}
+Adding a machine name to the \textit{/etc/samba/private/smbpasswd} file
+添加一个机器用户，用户名为machine，保存在/etc/samba/private/smbpasswd文件中。
+# \textbf{smbpasswd -a -m machine}
+\end{Verbatim}
+
+要注意的是，所添加的用户名或机器用户名必须事先就存在于
+\path{/etc/passwd}文件中。当然，可以通过\texttt{adduser}命令添加该用户。
+注意，在使用\texttt{adduser}添加机器名时，机器名的末尾要加上美元符
+（``\$''），但在使用\texttt{smbpasswd}的时候不要加美元符，因为
+\texttt{smbpasswd}会自动加上。如果使用\texttt{adduser}时不这么命名的话，
+为samba添加机器名时会出现错误。
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{adduser machine\$}
+\end{Verbatim}
+
+
+\subsection{网络文件系统（NFS）}
+\label{sec:networkConfiguration:networkFileSystem:networkFileSystem}
+NFS（全称为Network File System，直译为网络文件系统）最早是由SUN公司为
+其旗下的Solaris系统（另一个类Unix系统）开发的。与SMB对比，NFS的设置及
+运行极为简单，但安全性比SMB略逊一筹。NFS的不安全性体现在我们可以根据一
+台机器的的用户名及组ID猜到另一台机器的信息。NFS不是一个认证式协议。NFS
+协议在之后的版本被重新修订以增加安全性，但在本书写作的时候，NFS已经不
+怎么流行了。
+
+NFS的配置是由\path{/etc/exports}文件管理的。当我们用文本编辑器打开该文
+件时，只能看到一个空的文件，只是最上面的几行注释。我们需要为每一个想导
+出的目录在该文件中加上一条导出条目，在条目上还在加上允许共享的客户端列
+表。还是举个例子说明吧。假设我们要导出\path{/home/foo}目录，并允许工作
+站Bar共享，我们只要在\path{/etc/exports}中添加下面这行：
+\begin{Verbatim}[frame=single]
+/home/foo Bar(rw)
+\end{Verbatim}
+下面，我们将展示在exports的man手册中展示的例子：
+\begin{Verbatim}[frame=single]
+# sample /etc/exports file
+/              master(rw) trusty(rw,no_root_squash)
+/projects      proj*.local.domain(rw)
+/usr           *.local.domain(ro) @trusted(rw)
+/home/joe      pc001(rw,all_squash,anonuid=150,anongid=100)
+/pub           (ro,insecure,all_squash)
+\end{Verbatim}
+从例子中可以看到，我们可以使用很多的选项，这些选项的意思在例子中也可以
+清楚地看出（不懂英语的同学查查单词吧）。
+
+NFS工作时作出如下假设：在一个网络中，一台机器上的用户即使在其它机器上
+想要访问服务器上的文件，使用的也是同一个用户ID。而在NFS客户端对NFS服务
+器进行访问时，要将发起请求的用户ID连同请求一起发送给服务器。而该用户ID
+的权限与该用户在本机上的读写权限是一致的。正如我们看到的一样，如果另一
+个用户使用一个已知用户的ID来访问服务器，那他就可以在ID的主人不知情的情
+况下做一些坏事。作为防止这种事件的一个手段，每个文件夹在挂载的时候使用
+了\texttt{root\_squash}选项。使用该选项会将那些声称自己是root的ID映射到
+一个不同的UID上，这就使从外部访问这些导出目录的用户无法使用
+\texttt{root}权限。\texttt{root\_squash}貌似是默认开启的，但我们还是建
+议你在\path{/etc/exports}文件中手动设置一下。
+
+当然，我们也可以通过使用\texttt{exports}命令来添加导出目录。例如：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+# \textbf{exports -o rw,no_root_squash Bar:/home/foo}
+\end{Verbatim}
+本行命令的作用是：导出\path{/home/foo}目录使名为``Bar''的机器访问，相
+应的权限为读写权限。另外，NFS服务器不会使用\textbf{root\_squash}权限，
+这意味着在``Bar''机器上的任何UID为``0''（root用户的UID）的用户都会拥有
+与服务器上的root用户相同的权限。该命令的语法看起来比较奇怪（一般而言，
+使用诸如\texttt{computer:/directory/file}这样的语法时，我们指的是一台机
+器上的某个文件）。
+
+关于exports文件的更多信息，请参阅它的man手册。
+
+
+
 
 
 %%% Local Variables: 
