@@ -198,7 +198,7 @@ CD启动，就像在光驱这一节中讨论的一样）。启动盘镜像位于
 \texttt{bootdisks/}目录下。
 
 Slackware中，可以选择不止一个启动盘（具体而言是16个。）。在文件
-\texttt{bootdisks/README.TXT}中有所有启动盘的完整列表及对应的描述。然
+\path{bootdisks/README.TXT}中有所有启动盘的完整列表及对应的描述。然
 而，多数用户可以使用\texttt{bare.i}（IDE设备使用）或
 \texttt{scsi.s}（SCSI设备用）的启动盘镜像。
 
@@ -327,8 +327,8 @@ Slackware 的安装器会让你进入一个载入系统内存的轻量Linux发�
 了（安装器中不需要密码），这时就应该设置硬盘了。在这个节点上，如果你希
 望得到一个加密的根分区，你可以安装支持RAID或LVM的软件，但这个主题已经
 超出了本书的范畴。如果你希望使用这些先进的工具，我强烈建议你查看CD上的
-\texttt{README\_RAID.TXT}，\texttt{README\_LVM.TXT}及
-\texttt{README\_CRYPT.TXT}文件。大多数用户并没有这种需求，因此应该直接
+\path{README\_RAID.TXT}，\path{README\_LVM.TXT}及
+\path{README\_CRYPT.TXT}文件。大多数用户并没有这种需求，因此应该直接
 跳到下一步——分区。
 
 \section{分区}
@@ -535,7 +535,7 @@ Slackware安装器有一个基本的概述。其中的多数信息是关于对�
 个文件，尽管Slackware的安装器不支持交换文件），当计算机的可用内存不足
 时，会将活动的系统内存拷贝到这个分区中。通过这个方法让计算机能够在活动
 内存中切换进切换出，从而能使用比计算机实际拥有的更多的内存。本步骤会将
-你的交换分区加入\texttt{/etc/fstab}中，使之在你的操作系统中生效。参见
+你的交换分区加入\path{/etc/fstab}中，使之在你的操作系统中生效。参见
 图\ref{fig:setup-swap}。
 \begin{figure}[htpb]
   \centering
@@ -722,7 +722,7 @@ LILO的安装位置，通常可以选择将其安装在硬盘的MBR（主引导�
 \subsubsection{网络设置}
 \label{sec:installation:setup:configure:network}
 网络设置实际上就是运行\texttt{netconfig}脚本。详情请参见第
-//TODO:Section 5.1//节。
+\ref{sec:networkConfiguration:netconfig}节。
 
 \subsubsection{选择默认启动的服务}
 \label{sec:installation:setup:configure:services}
