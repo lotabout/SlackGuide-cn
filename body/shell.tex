@@ -1,0 +1,387 @@
+
+\chapter{Shell}
+\label{chap:shell}
+
+\rule[0pt]{\textwidth}{0.1pt}
+
+在图形环境下，程序包含了窗口、滚动条、菜单等等，这些程序为用户提供了图
+形接口。在命令行环境下，用户接口则是由shell提供的。shell的功能就是解释
+命令，一般地，有了shell，一些东西就变得可用了。在登陆后（本章中涵盖了
+该内容），用户会进入一个shell，并可以在shell中完成他们的工作。本章会对
+shell作一个介绍，并介绍Linux用户中使用最多的一个shell---the Bourne
+Again Shell（bash）。有关本章内容的更多细节，请参见见
+\texttt{bash\textbf{(1)}}的man手册。
+
+\section{用户}
+\label{sec:shell:users}
+
+\subsection{登陆}
+\label{sec:shell:users:loggingIn}
+那么，我们启动了系统，我们会看到诸如下面的内容：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+Welcome to Linux 2.4.18
+Last login: Wed Jan
+1 15:59:14 -0500 2005 on tty6.
+darkstar login:
+\end{Verbatim}
+嗯……貌似没人说过应该怎么登陆。还有，darkstar是什么东东？darkstar只是
+我们计算机的名字，而darkstar就是默认的名字。如果在安装过程中我们对计算
+机名进行了设置（在netconfig中设置的），那么我们看到的就不是darkstar而
+是我们自己设置的名字了。
+
+至于登陆嘛……如果这是第一次启动，那么我们应该使用\texttt{root}登陆，
+输入用户名后会提示输入密码，如果在安装过程中设置了\texttt{root}用户的
+密码，那么这时候只要输入那个密码就可以了。如果当时没有设置密码，那么输
+入回车即可。这就OK了---我们登陆了。
+
+\subsection{root:超级用户}
+\label{sec:shell:users:root}
+OK，那么谁是或者说什么是\texttt{root}？在我们的系统中它又和用户帐号有
+什么联系呢？
+
+好的，在Unix及一些类似的操作系统（如Linux）的世界中，先有的是用户，然
+后还是用户。之后我们会详细介绍，现在我们要知道\texttt{root}是一个用户，
+且是在其它所有用户之前就存在的一个用户；\texttt{root}是全知的全能的，
+没有用户可以违抗\texttt{root}。这是不允许发生的情况。\texttt{root}被称
+为超级用户，它就是这么牛B。但最重要的是，\texttt{root}就是你自己。
+
+是不是很嚣张？
+
+不知道？那我们告诉你，是的，它就是很嚣张。但要注意的是，
+\texttt{root}的设计使它能破坏一切它想破坏的东西。你可能希望先跳到第
+% TODO :ref Section 12.1.1You're not using any Dropbox API apps.
+节，学习如何创建一个普通用户，并用普通用户登陆及工作。传统的用法是，只
+在绝对需要的情况下才切换到超级用户，以此来保证破坏系统的最小可能性。
+
+顺带一提，如果你先用其它用户登陆了，但想临时切换到root用户也是没问题的。
+只要使用\texttt{su\textbf{(1)}}命令即可。它会要求你输入\texttt{root}用
+户的密码，正确的话，它会让你拥有\texttt{root}权限，直到你用
+\texttt{exit}或\texttt{logout}退出为止。当然，使用\texttt{su}命令可以
+让你临时以任何用户登陆，只要知道密码即可。
+
+\begin{quote}
+  注意：\texttt{root}用户可以su到任意用户，而且不需要输入密码。
+\end{quote}
+
+
+\section{命令行}
+\label{sec:shell:commandLine}
+
+\subsection{运行程序}
+\label{sec:shell:commandLine:runningPrograms}
+不运行程序，几乎就做不成任何事，你可能会用你的电脑支撑一些东西；或着用
+来挡着门，好让门一直开着；一些电脑在运行时还会发出可爱的嗡嗡响，但这并
+不是我们所指的``做成事情''。我们可以相信，把计算机当作嗡嗡响的制门器并
+不是计算机倍受喜爱的原因。
+
+so，还记得Linux中几乎所有的东西都是用文件表示吗？好吧，这个规则对于程
+序也适用。每个我们运行的（非shell内置的）程序都指向存在于某个地方的文
+件。只要指定该文件的完整路径即可运行对应的程序。
+
+例如，还记得上节中介绍的\texttt{su}命令吗？它实际位于\path{/bin}目录中：
+输入\path{/bin/su}就可以正确运行它。
+
+既然要输入完整路径，那为什么我们只输入\texttt{su}就能运行呢？毕竟我们
+没有说它就在\path{/bin}目录下，它也可能在\path{/usr/local/share}目录下
+对吧？那么shell是如何知道它的位置呢？这个问题的根源就在于环境变量
+\texttt{PATH}中；多数的shell要么有环境变量\texttt{PATH}，要么有一此和
+\texttt{PATH}功能类似的变量。它包含一个列表，列表中的每一项就是我们可
+能运行程序的目录。所以我们执行\texttt{su}命令时，shell会逐一搜索
+\texttt{PATH}中的目录列表，在每个列表中寻找一个名为\texttt{su}的可执行
+文件，遇到第一个\texttt{su}后，就运行它。在没有指定程序的完整路径时，
+shell就会按如上的方法进行搜索，所以如果你碰到``Command not found''错误，
+那就意味着你运行的程序所有的目录不在\texttt{PATH}中（当然，也可能是这
+个程序圧根就不存在）。我们会在第//TODO: ref Section 8.3.1 节中对环境变
+量进行深入介绍。
+
+还记得``.''代表当前目录吗？所以如果你恰好就在\path{/bin}目录下，那么输
+入\path{./su}就代表了完整的路径，所以也能正常运行。
+
+\subsection{通配符匹配}
+\label{sec:shell:commandLine:wildcard}
+几乎所有的shell都会识别一些特定的字符，用来表示可以使用任意内容来替换
+当前位置的内容。这些字符就被称作通配符（wildcard），最常用的两个就是
+``*''和``?''。根据约定，?通常代表能匹配任意单个字符。例如，假设我们所
+在的目录下有三个文件：\path{ex1.txt}、\path{ex2.txt}及\path{ext3.txt}，
+我们想把所有的文件复制到另一个文件夹下（使用在将在第//TODO: ref
+Section 10.5.1节中介绍的\texttt{cp}命令），假设是\path{/tmp}。那么一个
+直观的方法是使用命令
+\begin{verbatim}
+cp ex1.txt ex2.txt ex3.txt /tmp
+\end{verbatim}
+但这个命令要输入的东西太多了。我们可以使用上面介绍的?通配符，那么输入
+\begin{verbatim}
+cp ex?.txt /tmp
+\end{verbatim}
+就可以了。上面例子中，?会匹配字符``1''、``2''、``3''，这三个字符会轮流
+替换上述命令中的?。
+
+现在呢？是不是觉得要输的东西还是太多呢？是的。这是很令人震惊的，我们已
+经有劳动法来保护我们，却还要做这么我的工作。幸运的是，我们还有一个通配
+符——``*''。正如我们已经说过的，*可以匹配``任意多个任意的字符''。包括0
+个字符。所以如果上面提到的三个文件是文件夹下仅有的三个文件，那么我们可
+以使用如下命令就能一次性搞定。
+\begin{verbatim}
+cp * /tmp
+\end{verbatim}
+然而，如果文件夹下还有一个\path{ex.txt}文件和一个\path{hejaz.txt}文件，
+我们希望复制\path{ex.txt}文件但不希望复制\path{hejaz.txt}，那么只要使
+用命令\verb|cp ex* /tmp|即可。
+
+而\verb|cp ex?.txt /tmp|命令只会匹配最先提到的那三个文件，而
+\path{ex.txt}中并没有额外的字符可以匹配?，所以不会被匹配。
+
+另一个常用的通配符是中括号对``[ ]''。在进行匹配时，中括号中出现的任意
+字符都可以替换到中括号所在的位置。听起来比较乱，举个例子：现在我们有一
+个文件夹，文件夹中有下面8个文件：\path{a1,a2,a3,a4,aA,aB,aC,aD}，现在
+我们要列出以数字结尾的文件，那么使用``[ ]''就可以完成这个任务。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ls a[1-4]}
+a1 a2 a3 a4
+\end{Verbatim}
+
+但如果我们想要的只是\path{a1,a2}和\path{a4}呢？前面的例子中，我们用-来
+表示从1到4的数字，我们也可以使用逗号来分隔单独的项。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ls a[1,2,4]}
+a1 a2 a4
+\end{Verbatim}
+
+我猜现在你在想的是，``如何匹配字符呢？''。Linux中是区分大小写的，这意
+味着\texttt{a}与\texttt{A}是不同的字符，除了在我们脑袋之外，计算机是不
+认为它们之间有什么关联的。要注意的是大写的字母在字母表中位于小写字母的
+前面。所以\texttt{A}和\texttt{B}出现在\texttt{a}各\texttt{b}的前面。继
+续之前的例子，如果我们想显示的文件名是\path{a1}及\path{A1}，也可以快速
+地用``[ ]''实现。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ls [A,a]1}
+A1 a1
+\end{Verbatim}
+
+注意，如果我们不是用逗号而是用横杠（`-'），那么得到的就是错误的结果了
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ls [A-a]1}
+A1 B1 C1 D1 a1
+\end{Verbatim}
+
+我们也可以结合使用横杠和逗号来表示一个串。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ls [A,a-d]}
+A1 a1 b1 c1 d1
+\end{Verbatim}
+
+
+\subsection{重定向输入输出及管道}
+\label{sec:shell:commandLine:redirectionAndPiping}
+（接下来的东西就相当有意思了）
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ps > blargh}
+\end{Verbatim}
+
+知道这是什么吗？这是我在运行\texttt{ps}命令来查看当前运行的进程。
+\texttt{ps}命令会在第//TODO:Section 11.3节中进行介绍，这不是有意思的部
+分，有意思的是\texttt{> blargh}，它的意思是将\texttt{ps}命令的输出写到
+一个名为\texttt{blargh}文件中。但先等等，下面的东西更有意思。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ps | less}
+\end{Verbatim}
+
+这个命令将\texttt{ps}命令的输出通过管道送给\texttt{less}，这样我就可以
+在我想滚动的时候滚动屏幕了。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ps >> blargh}
+\end{Verbatim}
+
+这是第三个最常用的重定向，它的作用与``$>$''一致，只是，当
+\texttt{blargh}文件存在时，``$>>$''会将\texttt{ps}命令的输出追加到
+\texttt{blargh}文件中；如果不存在，它的作用与``$>$''一致，会先创建文件，
+再将内容写入文件。（``$>$''会擦除\texttt{blargh}文件的所有内容。）
+
+还有一个重定向符：``<''，它的作用是从该符号之后指定的位置读取输入，相
+比之下用得不多。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{fromdos < dosfile.txt > unixfile.txt}
+\end{Verbatim}
+
+如果我们学会使用管道，很多东西就变得很有意思：
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ps | tac >> blargh}
+\end{Verbatim}
+上面这个命令会先运行\texttt{ps}，将输出的每一行反转后追加到文件
+\texttt{blargh}中。你可以按自己的需要将一些命令组合进来，只要记得它们
+是从左往右解释的就行了。
+
+关于重定向的更多知识，请参见\texttt{bash\textbf{(1)}}的man手册。
+
+\section{The Bourn Again Shell (bash)}
+\label{sec:shell:bash}
+
+\subsection{环境变量}
+\label{sec:shell:bash:environmentVariables}
+
+Linux系统是个复杂的畜牲，在运行的时候需要记录很多东西，在与其它程序正
+常交互的时候需要用到很多的细节（有些你可能从来都没意识到）。没有人想在
+运行程序的时候为程序传递一堆参数，告诉程序要用什么样的终端、计算机的主
+机名是什么，要使用什么样的提示信息……
+
+就好比是一个自动复制的机器一样，我们把它叫作环境变量。所有的Shell都用环
+境变量来记录信息，来方便用户的使用。所谓的环境变量只是一堆信息的缩写，
+用户可能希望记录这些信息以便之后使用。例如，环境变量PS1告诉Shell如何显
+示提示符，另外一些变量可能是用来告诉程序如何运行的。这里，我们会对bash
+提供的处理环境变量的一些命令进行简要介绍。
+
+\texttt{set}在单独使用时会显示当前定义的所有环境变量。就像多数bash内置
+的命令一样，它还能完成一些其它的任务（加参数），关于这些内容，请自己查
+阅\texttt{bash\textbf{(1)}}的相关文档。下面的例子中就是在作者机子上单
+独运行\texttt{set}使得得到结果的一个摘录。注意到我们之前提到的
+\texttt{PATH}环境变量。在\texttt{PATH}变量的目录中的程序只要输入文件名
+就可以运行了，而不需要完整路径。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{set}
+PATH=/usr/local/lib/qt/bin:/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:
+/usr/openwin/bin:/usr/games:.:/usr/local/ssh2/bin:/usr/local/ssh1/bin:
+/usr/share/texmf/bin:/usr/local/sbin:/usr/sbin:/home/logan/bin
+PIPESTATUS=([0]="0")
+PPID=4978
+PS1='\textbackslash{}h:\textbackslash{}w\textbackslash{}\$ '
+PS2='> '
+PS4='+ '
+PWD=/home/logan
+QTDIR=/usr/local/lib/qt
+REMOTEHOST=ninja.tdn
+SHELL=/bin/bash
+\end{Verbatim}
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{unset VARIABLE}
+\end{Verbatim}
+
+\texttt{unset}会移除环境变量，包括环境变量的值及环境变量本身
+，\texttt{bash}会忘记该变量的存在（不要害怕，除非是你在某个shell会话中
+单独定义的变量，否则其它会话里变量还是会重新定义的，那就是默认的一些变
+量）。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{export VARIABLE=some\_value}
+\end{Verbatim}
+
+使用\texttt{export}真的很方便。它可以为某个环境变量\texttt{VARIABLE}赋
+值为``some\_value''，如果环境变量\texttt{VARIABLE}之前不存在，那么执行
+完上述命令后它就存在了。如果环境变量\texttt{VARIABLE}之前有其它值，那
+么现在也被删除，替换为新的值。当然，如果我们只是想在\texttt{PATH}中加
+入一个新的文件夹，那么这个特性就不太适合了，这个情况下，我们可能会采用
+如下命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{export PATH=\$PATH:/some/new/directory}
+\end{Verbatim}
+
+注意\texttt{\$PATH}这里的用法：当我们希望\texttt{bash}解释一个变量时
+（即得到它原有的值），在变量名前加上\$符即可。例如\verb|echo \$PATH|就
+会将\texttt{PATH}中的值显示出来，如我的例子中：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{echo \$PATH}
+/usr/local/lib/qt/bin:/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:
+/usr/openwin/bin:/usr/games:.:/usr/local/ssh2/bin:/usr/local/ssh1/bin:
+/usr/share/texmf/bin:/usr/local/sbin:/usr/sbin:/home/logan/bin
+\end{Verbatim}
+
+
+\subsection{Tab补全}
+\label{sec:shell:bash:tabCompletion}
+（这个东西又是很有意思的）
+\begin{enumerate}
+\item 命令行接口意味着要输入很多内容。
+\item 输入是一项工作
+\item 没人喜欢工作
+\end{enumerate}
+由第3点和第2点，我们可以得到第4点：没人喜欢输入。幸运的是，
+\texttt{bash}作了一些设计，防止第5点（没有喜欢命令行接口 ）的发生。
+
+那么我们会问：\texttt{bash}是怎么完成这项壮举的呢？除了之前我们介绍的
+通配符匹配，\texttt{bash}还有一个特性：tab补全。
+
+Tab补全的工作原理如下：我们输入一个文件名，它可能在你的\texttt{PATH}中，
+也可能由我们手工输入完整路径。不论是哪种情况，我们要做的只是输入足够的
+内容使我们能唯一定位某个文件，之后按下tab键就可以了。\texttt{bash}会为
+我们完成剩下的输入。
+
+当然，还得用例子来解释。假设\path{/usr/src}目录下有两个子文件夹：
+\path{/usr/src/linux}和\path{/usr/src/sendmail}。现在我们想知道
+\path{/usr/src/linux}目录下有什么，所以我只要输入\texttt{ls
+  /usr/src/l}，之后按TAB键，\texttt{bash}就会补全得到\texttt{ls
+  /usr/src/linux}。
+
+现在，假设我们有两个目录\path{/usr/src/linux}和
+\path{/usr/src/linux-old}，如果我们输入\path{/usr/src/l}后键入TAB，
+\texttt{bash}会为我们补全尽可能多的内容，因此我们会得到
+\path{/usr/src/linux}，当然，到这点我就可以停下了，或者我也可以再敲下
+TAB键，\texttt{bash}会显示一张列表，列出与我当前输入内容匹配的所有目录
+的列表。
+
+从今往后，我们就不要输入这么多内容了（也因此，人们喜爱命令行接口）。是
+吧，我说过这个东西很有意思的。
+
+
+\section{虚拟终端}
+\label{sec:shell:virtualTerminals}
+想像这样一种情况，你在做着一件事，但突然决定要先做另一件事。现在我们必
+须先停下当前的工作，并切换到准备完成的任务。但还记得Linux是多用户系统
+吗？也就是我们想同时登陆多少次都可以的对吗？所以为什么我们只能一次做一
+件事呢？
+
+的确没必要，我们不可能都为同一个机器配备好几个键盘、鼠标，更关键的是我
+们中的多数人也不想要这么多东西。这就很明了了，增加硬件并不是我们要的答
+案。那么就剩下软件了，Linux已经在这方面做了一定的工作，为我们提供了
+``虚拟终端(virtual terminals)''或简称``VTs''。
+
+按下Alt及功能键（F1～F12），就能在虚拟终端中进行切换，每个功能键对应一
+个虚拟终端。Slackware默认提供了6个VT，按下Alt+F2就可以切换到第二个虚拟
+终端中，Alt+F3对应第三个，以此类推。
+
+剩下的功能键为X会话保留，每个X会话使用自己的VT，从第7个（Alt+F7）往上。
+在X中，Alt+Fn键会被捕捉的，因此，在X中使用Ctrl+Alt+Fn进行切换。所以如
+果我们在X中，想切换回文本终端（而不退出X会话），那么如Ctrl+Alt+F3会切
+换到第三个终端中。（如果使用X会话，那么Alt+F7会再切回X。）
+
+\subsection{Screen}
+\label{sec:shell:virtualTerminals:screen}
+但如果在没有虚拟终端的情况下呢？怎么办？幸运的是，Slackware还包括了一
+个很好的屏幕管理器，而名字就叫作\texttt{screen}。\texttt{screen}是一个
+终端模拟器，有着与虚拟终端近似的功能。执行\texttt{screen}会闪出一个简
+短的介绍，之后就进入一个终端。与传统虚拟终端不同的是，\texttt{screen}
+有自己的命令。所有的\texttt{screen}命令都要先按下Ctrl+A组合键。例如，
+Ctrl+A+C的作用是创建一个新的终端会话，Ctrl+A+N的作用就是切换到下一个终
+端，对应的Ctrl+A+P会切换到上一个终端中。
+
+\texttt{screen}还提供了从\texttt{screen}会话中分离及重新附加到某一会话
+中的功能，这对于通过\texttt{ssh}及\texttt{telnet}（之后会介绍）进行的
+远程连接来说异常有用。执行\verb|screen -r|命令会列出当前运行的可以重新
+附加到的会话。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{screen -r}
+There are several suitable screens on:
+     1212.pts-1.redtail (Detached)
+     1195.pts-1.redtail (Detached)
+     1225.pts-1.redtail (Detached)
+     17146.pts-1.sanctuary (Dead ???)
+Remove dead screens with ’screen -wipe’.
+Type "screen [-d] -r [pid.]tty.host" to resume one of them.
+\end{Verbatim}
+运行\verb|screen -r 1212|会重新附加到表中的第一个screen。我之前提到过
+它对于远程连接的优势。如果我们使用\texttt{ssh}登陆到一个远程的
+Slackware服务器上，现在我们的连接可能由于本地机器断电等原因而断开，那
+么无论我当前在做什么工作，都会瞬间毁灭，这可能对服务器也很伤。如果使用
+\texttt{screen}，那么在连接断开时，它会将当前的会话从screen中分离开，
+一旦连接恢复，就可以重新附加到之前的screen会话中，并从断开处继续工作。
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 
