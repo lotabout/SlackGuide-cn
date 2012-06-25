@@ -1,0 +1,173 @@
+
+\chapter{操作文件及目录}
+\label{chap:handlingFilesAndDirectories}
+
+\rule{\textwidth}{0.1pt}
+
+Linux的目标是尽可能地类Unix。传统上，Unix操作系统是面向命令行的。
+Slackware中的确有图形的用户接口，但命令行仍是控制系统的主要方法。因此，
+理解一些基本文件管理命令是很重要的。
+
+接下来的几节中，我们会解释常见的文件管理命令并举一些使用它们的例子。还
+有许多其它的命令，但我们介绍的命令能让你逐渐上手。另外，我们只对这些命
+令进行简要介绍，要了解这些命令的细节，请查阅命令附带的man手册。
+
+
+\section{导航命令：ls、cd及pwd}
+\label{sec:handlingFilesAndDirectories:navigation}
+
+\subsection{ls}
+\label{sec:handlingFilesAndDirectories:navigation:ls}
+这个命令是``list''的缩写，它的作用是列出一个文件夹中的文件。如果你熟悉
+Windows及DOS，那么ls就像是其中的\texttt{dir}命令。如果不带任何参数，
+\texttt{ls\textbf{(1)}}会列出当前目录下的文件。要查看根目录下的文件，
+可以使用如下命令：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{cd /}
+darkstar~\% \textbf{ls}
+bin   dev  home  lost+found  mnt  proc  sbin  sys  usr
+boot  etc  lib   media       opt  root  srv   tmp  var
+\end{Verbatim}
+
+对于这个输出，多数人的问题是没办法轻易区分哪个是目录，哪个是文件。一些
+用户喜欢让\texttt{ls}在每个列表项的末尾加上一个类型识别符，如：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{cd /}
+darkstar~\% \textbf{ls -FC}
+bin/   dev/  home/  lost/+found/  mnt/  proc/  sbin/  sys/  usr/
+boot/  etc/  lib/   media/       opt/  root/  srv/   tmp/  var/
+\end{Verbatim}
+目录名之后会加上一个反斜杠（`/'），可执行文件名之后会加上一个星号（`*'）
+等等。
+
+\texttt{ls}也可以用来显示其它的文件数据信息。例如，要显示一个文件的创
+建日期、所有者及权限等，可以使用\texttt{ls}显示长列表：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\%\texttt{ls -l}
+# \textbf{ls -l}
+total 88
+drwxr-xr-x   2 root root  4096 Apr 30  2007 bin/
+drwxr-xr-x   2 root root  4096 Jun 19 13:56 boot/
+drwxr-xr-x  15 root root  5180 Jun 21 21:37 dev/
+drwxr-xr-x  78 root root 12288 Jun 21 12:03 etc/
+drwxr-xr-x   4 root root  4096 Feb 28  2011 home/
+drwxr-xr-x   6 root root  4096 Mar 19  2011 lib/
+drwx------   2 root root 16384 Jun 15 21:35 lost+found/
+drwxr-xr-x  16 root root  4096 Jun 21 12:04 media/
+drwxr-xr-x  10 root root  4096 Sep 26  2006 mnt/
+drwxr-xr-x   3 root root  4096 Jun 20 08:25 opt/
+dr-xr-xr-x 110 root root     0 Jun 21 20:03 proc/
+drwx--x---  11 root root  4096 Jun 23 15:28 root/
+drwxr-xr-x   2 root root 12288 Jun 20 08:29 sbin/
+drwxr-xr-x   2 root root  4096 Jun 15 22:12 srv/
+drwxr-xr-x  13 root root     0 Jun 21 20:03 sys/
+drwxrwxrwt   4 root root  4096 Jun 21 09:40 tmp/
+drwxr-xr-x  15 root root  4096 Apr  5  2011 usr/
+drwxr-xr-x  17 root root  4096 Mar 19  2011 var/
+\end{Verbatim}
+
+假设你想得到一个包含隐藏文件的当前目录的列表，可以使用如下命令：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{ls -a}
+./   bin/   dev/  home/  lost+found/  mnt/  proc/  sbin/  sys/  usr/
+../  boot/  etc/  lib/   media/       opt/  root/  srv/   tmp/  var/
+\end{Verbatim}
+以点号开头的文件（也称为点文件）在运行\texttt{ls}命令时会隐藏，只有在
+以\texttt{-a}为参数运行ls才可以看到。
+
+在ls的man手册上可以看到它还有许许多多的选项。运行ls的时候别忘了还可以
+加上选项。
+
+
+\subsection{cd}
+\label{sec:handlingFilesAndDirectories:navigation:cd}
+
+\texttt{cd}命令的作用是改变当前的工作目录。只要输入\texttt{cd}命令，以
+及想要切换到的目录即可。下面是一些例子：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar:~\$ \textbf{cd /bin}
+darkstar:/bin\$ \textbf{cd usr}
+bash: cd: usr: No such file or directory
+darkstar:/bin\$ \textbf{cd /usr}
+darkstar:/usr\$ \textbf{ls}
+bin
+darkstar:/usr\$ \textbf{cd bin}
+darkstar:/usr/bin\$
+\end{Verbatim}
+
+注意到，如果没有前置的斜杠（`/'），则切换目录时是相对于当前目录进行的。
+另外，如果运行\texttt{cd}命令是不带任何参数，则会切换到用户的主目录中。
+
+\texttt{cd}命令与其它命令不同，因为它是一个shell内置的命令。这个特点现
+在对你可能没什么影响，一般而言，这意味着这个命令没有man手册。相反的，
+你可以使用shell的帮助，如下：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{help cd}
+\end{Verbatim}
+它会打印出\textbf{cd}命令可用的选项。
+
+\subsection{pwd}
+\label{sec:handlingFilesAndDirectories:navigation:cd}
+\texttt{pwd}的全称是打印工作目录（print working directory）。它的作用
+就是显示当前位置。使用\texttt{pwd}命令只要输入\textbf{pwd}即可。例子如
+下：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{cd /bin}
+darkstar~\% \textbf{pwd}
+/bin
+darkstar~\% \textbf{cd /usr}
+darkstar~\% \textbf{cd bin}
+darkstar~\% \textbf{pwd}
+/usr/bin
+\end{Verbatim}
+
+\section{分页程序：more、less及most}
+\label{sec:handlingFilesAndDirectories:pagers}
+
+\subsection{more}
+\label{sec:handlingFilesAndDirectories:pagers:more}
+\texttt{more\textbf{(1)}}命令被称为分页工具。有时，一个命令的输出太大
+了，一个屏幕不足以显示。而单独的命令并不知道如何控制输出使它适合在一个
+屏幕上显示。它们将这个任务留给了分页工具。
+
+\texttt{more}命令将其它命令的输出分成几个单独的屏幕，一次输出一个屏幕，
+直到用户按下空格键才输出下一屏，按回车键则向前显示一行。下面是个很好的
+例子：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \texttt{cd /usr/bin}
+darkstar~\% \texttt{ls -l}
+\end{Verbatim}
+
+这个命令的输出会在屏幕上滚动一会。要将该输出一屏一屏的输出，只要用管道
+将它传递给\texttt{more}命令即可：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{ls -l | more}
+\end{Verbatim}
+中间的符号为管道符（`|'），上述管道的含义是将\texttt{ls}的输出作为
+\texttt{more}的输入。除了\texttt{ls}，还可以用管道将其它几乎所有的东西
+传递给\texttt{more}命令。管道在第
+\ref{sec:shell:commandLine:redirectionAndPiping}节中有介绍。
+
+\subsection{less}
+\label{sec:handlingFilesAndDirectories:pagers:less}
+\texttt{more}命令很方便，只是有个致命的缺陷，就是如果翻到下一页就再也
+不能回到上一页。试想如果你在查看一个很大的文件，不小心错过了某一行，那
+就不得不重头查找，急煞人也。好在人们开发了\texttt{less\textbf{(1)}}命
+令，来解决这个问题。它的工作方式与\texttt{more}一样，所以上面的例子在
+这里也适用。所以\texttt{less}的功能远不止\texttt{more}。Joost Kremers
+是这样说的：
+\begin{quote}
+  \texttt{less} is more, but more \texttt{more} than \texttt{more} is,
+  so \texttt{more} is less \texttt{less}, so use more \texttt{less} if
+  you want less \texttt{more}.
+
+  \texttt{less}与\texttt{more}类似，但比\texttt{more}的功能更强大，所
+  以\texttt{more}的功能反而更少，因此，如果你想更少使用\texttt{more}，
+  那么请更多地使用\texttt{less}。
+\end{quote}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 

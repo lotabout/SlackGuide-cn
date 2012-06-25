@@ -1,0 +1,60 @@
+
+\chapter{Shell}
+\label{chap:shell}
+
+\rule[0pt]{\textwidth}{0.1pt}
+
+在图形环境下，程序包含了窗口、滚动条、菜单等等，这些程序为用户提供了图
+形接口。在命令行环境下，用户接口则是由shell提供的。shell的功能就是解释
+命令，一般地，有了shell，一些东西就变得可用了。在登陆后（本章中涵盖了
+该内容），用户会进入一个shell，并可以在shell中完成他们的工作。本章会对
+shell作一个介绍，并介绍Linux用户中使用最多的一个shell---the Bourne
+Again Shell（bash）。有关本章内容的更多细节，请参见见
+\texttt{bash\textbf{(1)}}的man手册。
+
+\section{用户}
+\label{sec:shell:users}
+
+\subsection{登陆}
+\label{sec:shell:users:loggingIn}
+那么，我们启动了系统，我们会看到诸如下面的内容：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+Welcome to Linux 2.4.18
+Last login: Wed Jan
+1 15:59:14 -0500 2005 on tty6.
+darkstar login:
+\end{Verbatim}
+嗯……貌似没人说过应该怎么登陆。还有，darkstar是什么东东？darkstar只是
+我们计算机的名字，而darkstar就是默认的名字。如果在安装过程中我们对计算
+机名进行了设置（在netconfig中设置的），那么我们看到的就不是darkstar而
+是我们自己设置的名字了。
+
+至于登陆嘛……如果这是第一次启动，那么我们应该使用\texttt{root}登陆，
+输入用户名后会提示输入密码，如果在安装过程中设置了\texttt{root}用户的
+密码，那么这时候只要输入那个密码就可以了。如果当时没有设置密码，那么输
+入回车即可。这就OK了---我们登陆了。
+
+\subsection{root:超级用户}
+\label{sec:shell:users:root}
+OK，那么谁是或者说什么是\texttt{root}？在我们的系统中它又和用户帐号有
+什么联系呢？
+
+好的，在Unix及一些类似的操作系统（如Linux）的世界中，先有的是用户，然
+后还是用户。之后我们会详细介绍，现在我们要知道\texttt{root}是一个用户，
+且是在其它所有用户之前就存在的一个用户；\texttt{root}是全知的全能的，
+没有用户可以违抗\texttt{root}。这是不允许发生的情况。\texttt{root}被称
+为超级用户，它就是这么牛B。但最重要的是，\texttt{root}就是你自己。
+
+是不是很嚣张？
+
+如果你还不确定，那我们告诉你，是的，它就是很嚣张。但要注意的是，
+\texttt{root}的设计使它能破坏一切它想破坏的东西。你可能希望先跳到第
+% TODO :ref Section 12.1.1
+节，学习如何创建一个普通用户，并用普通用户登陆及工作。
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 

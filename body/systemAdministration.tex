@@ -1,0 +1,465 @@
+
+\chapter{必要的系统管理}
+\label{chap:systemAdministration}
+
+\rule{\textwidth}{0.1pt}
+嘿！嘿！嘿！嘿！嘿！！我知道你在想什么。``我又不是系统管理员，我连想都
+没想过要变成一个系统管理员！''
+
+事实上，只要你有一台机器的\texttt{root}密码，你就是一个系统管理员。也
+许你控制的机器也就是一个桌面系统，上面就一两个用户，也或者你在控制着一
+个拥有成百上千用户的大型服务器。不管怎么样，我们还是要学习如何管理用户、
+如何安全地关闭计算机。这些任务可能看似简单，但脑子里还是要记得一些名言
+警句的。
+
+\section{用户及用户组}
+\label{sec:systemAdministration:usersAndGroups}
+正如在第\ref{chap:shell}章中说到的一样，我们平常工作时不应该以
+\texttt{root}用户登陆。而应该创建一个普通用户进行日常的使用，只在系统
+执行系统管理任务时才使用\texttt{root}用户。要创建一个新用户，我们可以
+使用Slackware提供的工具，也可以手工修改密码文件。
+
+\subsection{工具脚本}
+\label{sec:systemAdministration:usersAndGroups:suppliedScripts}
+管理用户及用户组最简单的方法是使用系统提供的脚本及程序。Slackware中包
+括了\texttt{adduser}、\texttt{userdel}(8)、\texttt{chfn}(1)、
+\texttt{chsh}(1)及\texttt{passwd}(1)等工具来处理用户帐户。而提供
+\texttt{groupadd}(8)、\texttt{groupdel}(8)及\texttt{groupmod}(8)来处理
+用户组。除了\texttt{chfn}、\texttt{chsh}及\texttt{passwd}，其它程序一
+般情况下只能由\texttt{root}运行。因此它也位于\path{/usr/sbin}目录下。
+\texttt{chfn}、\texttt{chsh}及\texttt{passwd}可以由任意用户运行，也因
+此位于\path{/usr/bin}目录下。
+
+我们可以通过\texttt{adduser}程序来添加用户。我们会先执行一遍该程序，演
+示该程序的所有提问及相应的含义。默认的答案由括号括起，几乎所有的问题都
+可以选择默认答案，除非你真的想对它进行修改。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{adduser}
+Login name for new user []: jellyd
+\end{Verbatim}
+这个问题是填写要添加用户使用的用户名。传统地，用户名是8个字符以下的由
+任意小写字符组成的。（当然也可以使用8个以上的字符，还可以使用数字，但
+除非别无他法，否则请遵守传统。）
+
+我们也可以在执行脚本时就指定用户名：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{adduser jellyd}
+\end{Verbatim}
+
+不论以上述哪种方式指定用户名，adduser都会提示输入为新用户使用的用户ID：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+User ID (’UID’) [ defaults to next available ]:
+\end{Verbatim}
+
+用户ID是Linux系统内部实际用来识别用户的方法。每个用户都有唯一的ID，
+Slackware中是从1000开始的。你可以手动为用户指定ID，也可以选择默认的方
+式，默认情况下使用的是下一个可用的ID。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+Initial group [users]:
+\end{Verbatim}
+
+所有的用户默认都加入\texttt{users}组。你也许想将新用户加入到一个不同的
+用户组，除非你清楚自己所做的行为，否则我们不建议你这么做。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+Additional groups (comma separated) []:
+\end{Verbatim}
+
+这个提问允许我们将新用户加入到一些额外的组中。用户组的作用是对一个类别
+的用户提供某些权限。还记得讲解文件权限时有一个权限组就是拥有文件的组的
+权限吗？通过设置某个文件的所有（属）组，并加某个用户加入特定的用户组中，
+就可以赋予该用户这个文件的某些权限。一个用户可以同时属于多个用户组。例
+如你建立了一些诸如用来修改网站、玩游戏或其它功能的用户组时，这个功能就
+很有用了。例如，一些站点定义了\texttt{wheel}组，作为唯一能使用
+\texttt{su}命令的给。或者，如Slackware默认安装后，使用\texttt{sys}组来
+为用户提供使用内置声卡播放声音的权限。
+
+如果是一个新手，不知道应该加入什么组，那么可以按方向键的``上''键，采用
+默认设置的一些额外用户组。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+Shell [ /bin/bash ]
+\end{Verbatim}
+
+\texttt{bash}是Slackware的默认shell，对于绝大多数人而言也是适用的。如
+果你是从Unix转过来的，那么可能更熟悉其它类型的shell，这种情况下，你可
+以现在就指定要使用的shell，也可以之后通过命令\texttt{chsh}来修改默认
+shell。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+Expiry date (YYYY-MM-DD) []:
+\end{Verbatim}
+
+我们可以设置帐号过期的日期。默认情况下是不设置过期时间的。当然，如果你
+喜欢，可以自己修改过期的日期。这个选项对于运行ISP的人们可能较为有用，
+因为它们可以设置一个帐号在某个时间过期，直到收到下一年的费用才为他们续
+期。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+New account will be created as follows:
+
+---------------------------------------
+Login name.......:  jellyd
+UID..............:  [ Next available ]
+Initial group....:  users
+Additional groups:  [ None ]
+Home directory...:  /home/jellyd
+Shell............:  /bin/bash
+Expiry date......:  [ Never ]
+
+This is it... if you want to bail out, hit Control-C.  Otherwise, press
+ENTER to go ahead and make the account.
+\end{Verbatim}
+
+现在我们会看到刚才输入的所有关于新用户的信息，并且得到一次中途退出的机
+会，如果刚才的输入有误，那么可以按Ctrl+C结束并重新来过，否则，我们可以
+按回车键，\texttt{adduser}就会开始创建帐号。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+Creating new account...
+Changing the user information for jellyd
+Enter the new value, or press return for the default
+        Full Name []: Jeremy
+        Room Number []: Smith 130
+        Work Phone []:
+        Home Phone []:
+        Other []:
+\end{Verbatim}
+下面的这些内容都是可选的。如果不想填就可以不填。而用户可以随时使用
+\texttt{chfn}命令来改变这些设定。但一般而言，我们会发现至少应该输入用
+户的全名和电话号码，防止之后可能要联系该用户。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+Changing password for jellyd
+Enter the new password (minimum of 5, maximum of 127 characters)
+Please use a combination of upper and lower case letters and numbers.
+New password:
+Re-enter new password:
+Password changed.
+Account setup complete.
+\end{Verbatim}
+
+之后我们被提示要为新用户设置一个密码，如果新用户当前不在，我们可以先设
+置一个默认的密码，并告诉用户及时修改。
+
+\begin{quote}
+  \textbf{注意：}选择一个密码：防止电脑被黑的第一层防线就是选择一个安
+  全的密码。不应该选择很容易猜到的密码，因为这样别人就能很容易地闯进你
+  的系统。理想的安全密码应该是一个随机的字串，其中包括大写、小写字母、
+  数字及一些随机的字符。（根据你所登陆的系统，使用TAB字符可能不是一个
+  好的选择。）有许多的软件是用来生成随机密码的；请上网搜索。\\
+  一般而言，记得一些常识就好了：不要使用某人的生日、常见的词组、桌上能
+  找到的东西或其它与你自己相关的东西。当然，如``secure1''或其它一些你
+  在书上或网上看到的密码也不是好密码。
+\end{quote}
+
+删除一个用户也是很容易的。只要运行\texttt{userdel}加上要删除的用户名。
+删除之前要确定要删除的用户没有登陆，并且不是以要删除的用户调用
+\texttt{userdel}。还有一点要记得，在删除一个用户之后，该用户的所有密码
+信息都会彻底被删除。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{userdel jellyd}
+\end{Verbatim}
+这个命令会删除我们刚建立的这个讨厌的\texttt{jellyd}用户。谢天谢地！现
+在这个用户已经从\path{/etc/passwd}、\path{/etc/shadow}及
+\path{/etc/group}文件中删除了，但用户的主目录还没有删除。
+
+如果你想一起删除用户的主目录，那么可以使用下面的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{userdel -r jellyd}
+\end{Verbatim}
+
+暂时关闭某个用户会在下一节中进行介绍，因为这涉及到改变用户的密码。改变
+其它的用户信息将在第
+\ref{sec:systemAdministration:usersAndGroups:changingUserInformation}
+节中进行介绍。
+
+添加和删除用户组的程序十分简单。\texttt{groupadd}会在\path{/etc/group}
+文件中新增一个条目，并赋予一个唯一的组ID，而\texttt{groupdel}会删除指
+定的组。而是否要通过修改\path{/etc/group}文件来将某个用户添加到特定的
+组中就取决于你自己了。例如，添加一个名为\texttt{cvs}的用户组：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{groupadd cvs}
+\end{Verbatim}
+而删除它则用命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{groupdel cvs}
+\end{Verbatim}
+
+\subsection{修改密码}
+\label{sec:systemAdministration:usersAndGroups:changingPasswords}
+\texttt{passwd}程序通过修改\path{/etc/shadow}文件来修改用户的密码。这
+个文件中以加密的方式保存了系统中的所有密码。要改变用户自己的密码，只要
+输入：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{passwd}
+Changing password for chris
+Old password:
+Enter the new password (minumum of 5, maximum of 127 characters)
+Please use a combination of upper and lower case letters and numbers.
+New password:
+\end{Verbatim}
+
+正如我们看到的，它先提示我们输入旧的密码。在输入的时候，屏幕上不会有任
+何的信息，就像登陆的时候一样。之后提示让我们输入新的密码。
+\texttt{passwd}会对你输入的密码做一系列的检查，如果你的密码过不了检查，
+它就会给出相应的提示信息。当然，我们可以完全不管这些警告信息，之后会要
+求我们再输入一次密码进行确认。
+
+如果你使用的是\texttt{root}，可以修改其它用户的密码：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{passwd  ted}
+\end{Verbatim}
+之后的过程和上面的一致，除了现在不需要输入旧的密码之外（这是使用
+\texttt{root}用户的福利之一……）。
+
+如果需要的话，我们也可以暂时关闭某个帐号，再在之后需要的时候开启它。关
+闭和开启帐号都可以通过\texttt{passwd}完成。要关闭一个帐号，用
+\texttt{root}执行下面的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{passwd -l david}
+\end{Verbatim}
+这个命令会将david的密码改成一个加密后永远也匹配不了的密码。之后可以通
+过如下命令来启用该帐号：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{passwd -u david}
+\end{Verbatim}
+
+现在，david的帐号又恢复正常。如果某个用户不遵守我们系统中的规定，停用
+帐号的功能就显得很有用了。当然，如果你看他不爽，也可以把它停用了。
+
+
+\subsection{修改用户信息}
+\label{sec:systemAdministration:usersAndGroups:changingUserInformation}
+
+用户可以修改的信息包括两个方面：使用的shell及他们的
+finger\footnote{finger是一个显示用户信息的命令，这里指可以修改它能显示
+的信息。}信息。Slackware中使用\texttt{chsh}（change shell，译为改变
+shell）及\texttt{chfn}（change finger，改变finger信息）来修改这些值。
+
+用户可以使用任意一个在\path{/etc/shells}文件中列出的shell。对于多数用
+户，\path{/bin/bash}就足够使用了。另一些人可能对它们工作或学校中的系统
+更为熟悉，并想使用那些shell。要改变默认的shell，使用\texttt{chsh}：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{chsh}
+Password: 
+Changing the login shell for chris 
+Enter the new value, or press ENTER for the default
+        Login Shell [/bin/bash]:
+\end{Verbatim}
+
+在输入密码\footnote{笔者在机器上测试时貌似不需要密码……}之后，输入想要使
+用的新shell的完整路径。首先请确保你输入的路径在\path{/etc/shells}(5)文
+件中列出。\texttt{root}用户可以为任何人改变shell，只要在运行
+\texttt{chsh}时加上要修改的用户名作为参数即可。
+
+所谓的finger信息是一些可选的信息：如用户的全名、电话号码及房间号等。这
+些信息可以通过\texttt{chfn}来改变，或在创建用户时指定。和以往一样，
+\texttt{root}可以为所有用户改变该信息。
+
+\section{用户及用户组：困难的方法}
+\label{sec:systemAdministration:usersAndGroupsHardWay}
+当然，因为用户及用户组的信息与控制都是通过文件进行的。所以我们也可以不
+通过任何脚本或专用的程序来管理，而只通过文本编辑器手工对相应的文件进行
+修改来达到管理用户及用户组的任务。在了解完它的过程后这项任务也是十分简
+单的，可能比使用脚本还简单。然而，了解密码信息的实际存储方式还是很重要
+的，这也可以防止你遇到需要修改这些信息，但手头上又没有相关工具的情况。
+
+首先，我们需要将一个新的用户加入到\path{/etc/passwd}(5)、
+\path{/etc/shadow}(5)及\path{/etc/group}(5)文件中。\texttt{passwd}文件
+存储了系统中的用户的一些信息，但奇怪的是，其中并不包括密码信息。历史上
+曾经使用该文件存放用户的密码信息，但在很早之前就已经因为安全原因停止了使
+用。因为\texttt{passwd}文件必须是所有用户可读的，但同时我们并不希望将加
+密的密码公开，因为一些潜在的入侵者在拥有加密的密码后，还是可以进行破解
+的。取而代之，我们将加密后的密码存放在\texttt{shadow}文件，该文件只有
+\texttt{root}用户可读，同时，\texttt{passwd}文件中的密码字段填写为
+``x''。\texttt{group}文件则列出所有的用户组，且包含哪个用户属于哪个组
+的信息。
+
+我们可以使用\texttt{vipw}命令来安全地对\path{/etc/passwd}文件进行修改。
+同样地，使用\texttt{vigr}命令安全地对\path{/etc/group}文件进行修改。而
+使用\texttt{vipw -s}对\path{/etc/shadow}文件安全地修改。（``安全地''意
+味着当前不会有两个用户同时对该文件进行修改。如果你是系统中唯一的管理
+员，那么一般情况下也是安全的，但小心驶得万年船。）
+
+让我们看看\path{/etc/passwd}文件的内容及如何添加一个新的用户。
+\path{passwd}的典型结构如下所示：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+chris:x:1000:100:Chris Lumens,Room 2,,:/home/chris:/bin/bash
+\end{Verbatim}
+每个用户占用一行，每行中的每个字段都由冒号（`:'）分隔。字段的含义分别为：
+登陆名、加密后的密码（由于Slackware中使用shadow文件，所以每个用户的该
+域都为``x''）、用户ID、组ID、可选的finger信息（由逗号分隔）、主目录及
+默认shell。要创建一个新用户，只要在文件末尾添加一个新的行，在每个域中
+添加相应的信息即可。
+
+我们添加的信息要满足一定的要求，否则添加之后可能登陆不了。首先，确保密
+码域为``x''，其次是用户名及用户ID都要是唯一的。再次是为用户添加一个组
+ID，可以是100（Slackware中的``users''组），也可以是你自己定义的默认组
+（填写的是组ID，而不是组名）。最后，为用户赋予一个有效的主目录（之后要
+手工创建的）和有效的shell（记得，shell必须是\path{/etc/shells}中的一
+个）。
+
+下一个步骤，我们要在\path{/etc/shadow}中添加相应的条目。该文件中包含了
+加密后的密码。一个典型的条目如下所示：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+chris:$1$w9bsw/N9$uwLr2bRER6YyBS.CAEp7R.:11055:0:99999:7:::
+\end{Verbatim}
+与之前一致，一个条目代表一个用户，字段是由冒号分隔的。每个字段的含义依次为：
+\begin{enumerate}
+\item 登陆名
+\item 加密后的口令
+\item 上次修改口令的时间，这个时间为从1970年1月1日算起的天数
+\item 两次两次修改口令间隔最少的天数，如果这个字段的值为空，帐号永久可用
+\item 两次修改口令间隔最多的天数，如果这个字段的值为空，帐号永久可用
+\item 提前多少天警告用户口令将过期，如果这个字段的值为空，帐号永久可用
+\item 在口令过期之后多少天禁用此用户；如果这个字段的值为空，帐号永久可用
+\item 用户过期日期；此字段指定了用户作废的天数（从1970年的1月1日开始的
+天数），如果这个字段的值为空，帐号永久可用
+\item 保留字段，目前为空，以备将来发展之用
+\end{enumerate}
+可以看到，多数信息为帐号过期的信息。如果你不需要使用过期信息，那么只要
+为一些字段填写某些特定的值。否则在填写之前就要经过一些思考和计算。对于
+一个新用户，只要在密码字段中随意填写一些信息即可。现在不需要担心密码的
+正确与否，因为我们一会儿就要修改。而密码字段中唯一不能包括的就是冒号。
+将``上次修改口令的时间''也放空。之后，填上0，99999和7，就像例子中一样，
+其它的字段不填。
+
+（对于那些看到加密的密码后，想破解密码的人，请继续。如果你破解了密码，
+你就会知道密码有一个加了防火墙的测试系统。\footnote{you'll know the
+password to a firewalled test system.不知道是不是指密码的的加密算法。}
+现在就很有用了。）
+
+在典型的Slackware系统中，所有的普通用户都是``users''组的一员。然而，如
+果你想创建一个新的组，或将新用户加到一个额外的用户组中，你就需要修改
+\path{/etc/group}文件。下面是一个典型的条目：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+cvs::102:chris,logan,david,root
+\end{Verbatim}
+字段含义分别为，组名：组密码：组ID：组成员（逗号分隔）。创建一个新的用
+户组就是在文件末尾添加新的一行，为它赋上一个唯一的组ID，并添加上属于它
+的所有用户即可。新加入组的用户要先登出再登陆才能生效。
+
+现在，我们最好用\texttt{pwck}及\texttt{grpck}命令来检查我们做的修改是
+否合法。首先，用\texttt{pwck -r}和\texttt{grpck -r}：\texttt{-r}选项的
+作用是不做任何的修改，使这两个命令只列出所做的修改，而不立即做出修改。
+（说得很饶口，自己试试就知道了。）我们也可以根据这个命令的结果来决定是
+否继续修改其它文件。不加\texttt{-r}参数执行\texttt{pwck}或
+\texttt{grpck}的结果是让文件保持我们手工所做的修改。
+
+现在，我们最好使用\texttt{passwd}命令来为用户创建合适的密码。之后再用
+\texttt{mkdir}为用户创建主目录，目录要与\path{/etc/passwd}文件中填写的
+内容一致。最后用\texttt{chown}将该目录的所属用户修改为新用户即可。
+
+删除用户的过程与创建完全相反：首先删除\path{/etc/passwd}及
+\path{/etc/shadow}文件中的相应条目，并从\path{/etc/group}文件中删除相
+应的用户名。最后，如果愿意的话，将用户的主目录及邮件目录及crontab的条
+目（如果有的话）一起删除就完成任务了。
+
+删除用户组就更容易了：删除\path{/etc/group}文件中的相应条目即可。
+
+\section{正确关机}
+\label{sec:systemAdministration:shuttingDown}
+正确关闭计算机是非常重要的。如果只是按下电源键来关机会对系统造成很大的
+损害。在系统运行的时候，即使你什么都不做，系统也在使用着一些文件。还记
+得吗？我们总是有一些在后台运行的进程。这些进程在管理着整个系统，并打开
+了许多文件。当系统电源断开时，这些文件不能正确关闭，就可能造成一些冲突。
+根据损坏的文件不同，系统也会产生不同的问题！不论是何种情况，下次系统启
+动时都要做一个很长的文件系统检查来修复这些问题。
+
+\begin{quote}
+  \textbf{注意：}如果你的系统是日志文件系统，如ext3或reiserfs，那么
+  系统损害时将得到一定的保护，比起不使用日志文件系统，如ext2，系统损坏
+  后的启动时会花更少的时间。然而，系统的保护措施并不能成为你强制关机的
+  借口。日志文件系统的目的是用来防止那些不受主观控制的事件，而不是用来
+  保护因为懒惰而造成的文件损坏。
+\end{quote}
+
+不管什么情况下，当我们想重启或是关机，都要正确进行。首先，有好几种方法
+来完成这个任务，所以要选择一个最有意思的（可能就是最方便的）方法。因为
+关机和重启是相似的过程，所以关机的方法大多对重启也适用。
+
+第一个方法就是通过\texttt{shutdown}(8)程序，它可能也算是最流行的方法了：
+\texttt{shutdown}可以在一个特定的时间对系统重启或是关机，而且会为所有
+当前登陆的用户显示一条信息，告诉他们系统正在关机。
+
+最基本的关机命令是：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{shutdown -h now}
+\end{Verbatim}
+这个例子中，我们并不打算为其它的用户显示提示信息，他们只能看到
+\texttt{shutdown}的默认信息。而``now''则表示我们预定的关机时间，而
+``-h''则代表要关闭系统。对于一个多用户的系统，这并不是一个很友好的组合，
+但对于自己的电脑来说可以很好地工作。用于多用户系统的一个更好的策略是提
+前告诉他们要关机了：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{shutdown -h +60}
+\end{Verbatim}
+
+这个命令将在一小时（60分钟）内关闭系统，在一个普通的多用户系统上，这个
+命令的效果就很不错了。一些重要的系统在关机之前的很长时间就做好了计划，
+并且需要通过一切可能的方式来通知用户（email，通知栏，\path{/etc/motd}
+等等）。
+
+重启系统可以使用同一个命令，只要将``-h''选项改为``-r''即可：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{shutdown -r now}
+\end{Verbatim}
+
+其它的诸如通知信息等与\texttt{shutdown -h}中介绍的一致。
+\texttt{shutdown}能在关闭或重启电脑前做很多其它的工作，请参见man手册。
+
+另一个关机的方法是使用\texttt{halt}(8)命令及\texttt{reboot}(8)命令。就
+像名字一样，\texttt{halt}会立即关闭操作系统，而\texttt{reboot}会立即重
+启系统（\texttt{reboot}其实是\texttt{halt}的一个符号链接。），调用如下
+例：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{halt}
+# \textbf{reboot}
+\end{Verbatim}
+
+一个更为底层的重启或关机的方法是直接与\texttt{init}对话。所有其它的方
+法只是提供一个与\texttt{init}更为方便的对话接口，但我们也可以直接使用
+\texttt{telinit}(8)来告诉\texttt{init}应该怎么做（注意telinit中只有一
+个`l'）。使用\texttt{telinit}来告诉\texttt{init}应该进入哪个运行级别，
+而进入某个运行级别时就会执行相应的脚本。这些脚本会杀死或创建一些进行以
+提供进入运行级别所需要的条件。对于重启和关机而言，只是对应两个特殊的运
+行级别而已。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{telinit 0}
+\end{Verbatim}
+运行级别0为关机模式。告诉\texttt{init}进入运行级别0会杀死所有当前运行
+的进程、之后卸载所有的文件系统、最后关闭机器。这是一个关闭系统的很好接
+受的过程。在许多笔记本及如今的桌面计算机上，这个命令的最终结果通常就是
+关闭电源。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{telinit 6}
+\end{Verbatim}
+运行级别6是重启模式。所有的进行都将被杀死、文件系统将被卸载、之后机器
+重新启动。这对于重启系统而言也是一个很好接受的过程。
+
+如果你还感到困惑，那么告诉你，只要你进入运行级别0或6，不论是用
+\texttt{shutdow}、\texttt{halt}还是\texttt{reboot}，都会运行
+\path{/etc/rc.d/rc.6}脚本。（\path{/etc/rc.d/rc.0}脚本也是
+\path{/etc/rc.d/rc.6}的一个符号链接。）你也可以自定义这些文件，但切记
+要仔细检查所做的任何修改。
+
+还有最后一种重启系统的方法。其它所有的方法都要求我们以\texttt{root}用
+户登陆，而这种方法即使在我们不是\texttt{root}的情况下也能重启系统，只
+要你手头上有键盘就可以了。使用Ctrl+Alt+Del就会让系统立即重启（在按下这
+个组合键时，系统将调用\texttt{shutdown}命令）。这个方法
+在X系统下不适用，但我们可以先用Ctrl+Alt+F1（或其它功能键）切换到非X
+Window终端下再使用些方法。
+
+最后，最终控制启动和关闭的文件是\path{/etc/inittab}(5)文件。一般而言，
+不需要对它进行修改，但查看该文件能让你了解到启动及关闭过程的一些细节。
+一样的，请参阅man手册。
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 

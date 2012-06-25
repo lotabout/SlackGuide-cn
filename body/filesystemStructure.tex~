@@ -1,0 +1,272 @@
+
+\chapter{文件系统结构}
+\label{chap:filesystemStructure}
+
+\rule{\textwidth}{0.1pt}
+
+我们已经讨论过Slackware的目录结构。现在，我们已经能够找到我们想找的文
+件或目录。但文件系统的内容不仅仅是目录结构。
+
+Linux是一个多用户的操作系统，系统的每个部分都是多用户的，即使是文件系
+统也是如此。系统存储了诸如文件的拥有者、能读取文件的用户等等信息。还有
+其它一些关于文件系统的独立部分，如链接及挂载NFS。本节中会对上述内容以
+及文件系统的其它方面进行解释。
+
+\section{所有权}
+\label{sec:filesystemStructure:owenership}
+文件系统为系统中的每个文件及目录保存了所有权信息。它包括哪个用户及用户
+组拥有一个特定的文件。查看这些信息的最简单的方法是通过\texttt{ls}命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ls -l /usr/bin/wc}
+-rwxr-xr-x 1 root bin 7368 Jul 30 1999 /usr/bin/wc
+\end{Verbatim}
+现在我们感兴趣的是第三和第四列。它们包含了拥有该文件的用户及用户组的信
+息。我们可以看到，用户``\texttt{root}''及用户组``\texttt{bin}''拥有该
+文件。
+
+使用\texttt{chown\textbf{(1)}}命令（它代表``change owner''——改变所有
+者）及\texttt{chgrp\textbf{(1)}}命令（它代表``change group''——改变所有
+者），我们可以很容易地改变文件的所有者和所有的用户组。要将文件的所有者
+改为\texttt{daemon}，我们可以使用\texttt{chown}：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{chown daemon /usr/bin/wc}
+\end{Verbatim}
+要将文件的所属用户组改为``\texttt{root}''，我们可以使用\textbf{chgrp}：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{chgrp root /usr/bin/wc}
+\end{Verbatim}
+
+我们也可以同时用\texttt{chown}指定文件的用户及用户组：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{chown daemon:root /usr/bin/wc}
+\end{Verbatim}
+
+上面的例子中，用户也可以使用点号（`.'）来代替冒号（`:'），得到的结果是
+一样的，但我们认为冒号是更好的形式。现在已经不再鼓励使用点号，在今后的
+\texttt{chown}版本中可能会移除这种形式，以支持带点号的用户名。带点号的
+用户名在Windows Exchange Server上非常流行，在email地址上也较常见，如
+\texttt{mr.jones@example.com}。在Slackware中，管理员一般避免使用这样的
+用户名，因为有一些脚本可能还是使用点号来分隔文件或目录的用户名和用户组。
+在我们的例子中，email地址就会被\texttt{chown}解释为用户名为``mr''，用
+户组为``johns''。
+
+文件的所有权是使用Linux系统中极为重要的一部分，即使你是使用这个系统的
+唯一用户。有时我们需要修复文件或设备节点的所有权。
+
+\section{权限}
+\label{sec:filesystemStructure:permission}
+多用户文件系统的另一个重要方面就是文件或目录的权限。有了权限的概念，我
+们就可以控制哪个用户可以读取、写入、执行某个文件。
+
+文件的权限信息是用四个八进制位保存的，每个八进制位指定了一个不同的权限
+集合，集合包括：所有者权限、所有组权限及其它用户权限。第四个八进制位是
+用来保存特殊的信息，如SetUID位、SetGID位及粘着位（sticky bit）等。要修
+改文件或目录的权限，对应的权限模式如下（可以用数字指定也可以用字符指
+定，这些字符与\texttt{ls}的输出相同，也可以使用于\texttt{chmod}中。）：
+
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{l|c|c}
+    \hline\hline 
+    权限类型 & 八进制值 & 对应字母 \\ \hline
+    ``sticky'' bit （粘着位） & 1 & t \\
+    SetUID 位 & 4 & s \\
+    SetGID 位 & 2 & s \\
+    读权限 （read） & 4 & r \\
+    写权限 （write） & 2 & w \\
+    执行权限 （execute） & 1 & x \\
+    \hline\hline
+  \end{tabular}
+  \caption{八进制权限值}
+  \label{tab:octalPermissionValue}
+\end{table}
+
+对于每个权限组，都可以使用八进制值指定权限。例如，如果你希望一个权限组
+的权限为可读写，那么，可以将该组的权限设置为``6''。
+
+bash的默认权限为：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{ls -l /bin/bash}
+-rwxr-xr-x 1 root bin 477692 Mar 21 19:57 /bin/bash
+\end{Verbatim}
+
+注意到该行最前面的一位为`-'，代表普通文件，如果是目录，则第一位为`d'。
+之后列出的是三个用户权限组（所有者、所有组及其它用户组）。我们可以看到，
+所有者的权限为可读、可写、可执行（rwx）。所有组权限的权限为可读、可执
+行（r-x）。其它用户的权限为可读、可执行（r-x）。
+
+那么如何设置一个文件的权限，让它与\texttt{bash}的权限一致呢？首先，我
+们创建一个文件example：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{touch /tmp/example}
+darkstar~\% \textbf{ls -l /tmp/example}
+-rw-rw-r--- 1 david users 0 Apr 19 11:21 /tmp/example 
+\end{Verbatim}
+我们使用\texttt{chmod\textbf{(1)}}命令（意思是``change mode''，即改变
+模式）来设置文件example的权限。将目标权限的八进制数字赋给文件即可。如
+我们希望所有者的权限为可读、可写、可执行，我们得到$4+2+1=7$，所有组及
+其它用户的权限为可读、或执行，我们得到$4+1=5$将这些数字结合起来传递给
+\texttt{chmod}，运行命令如下：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar~\% \textbf{chmod 755 /tmp/example}
+darkstar~\% \textbf{ls -l /tmp/example}
+-rwxr-xr-x 1 david users 0 Apr 19 11:21 /tmp/example 
+\end{Verbatim}
+
+现在你可能会想，为什么不在创建的时候就把文件的权限设置为现在这样呢？其
+实解决方法也很简单。\textbf{bash}内置了一个很漂亮的小程序，叫作
+\texttt{umask}。在多数Unix Shell中也包含这个命令。要适应\texttt{umask}
+需要一小段时间。它与\texttt{chmod}的工作方式相似，但是以相反的方式完成
+的。你可以使用umask为新创建的文件设置那些你不想让文件拥有的权限。默认
+权限为0022。以此为例，0022代表不希望赋予文件所有组的可写权限及其它用户
+的可写权限，还记得之前\texttt{bash}的权限为755，完整权限是777，那么
+umask为$777-555=022$.
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{umask}
+0022
+\% \textbf{umask 0077}
+\% \textbf{touch tempfile}
+\% \textbf{ls -l tempfile}
+-rw-------- 1 david users 0 Apr 19 11:21 tempfile
+\end{Verbatim}
+参见\textbf{bash}的man手册以获取更多信息。
+
+要使用\texttt{chmod}设置一些特殊的权限，在第一列中加上权限数值。例如，
+要设置SetUID位及SetGID位，就在权限数值的第一列处加上6：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{chmod 6755 /tmp/example}
+\% \textbf{ls -l /tmp/example}
+-rwsr-sr-x 1 david users 0 Apr 19 11:21 /tmp/example
+\end{Verbatim}
+
+如果你被这些八进制数搞晕了，\texttt{chmod}还允许使用字母来表示权限，权
+限表示如下：
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{c|c}
+    \hline \hline
+    权限组 & 对应字母 \\ \hline
+    Owner（所有者） & u \\
+    Group（所有组） & g \\
+    World（其它用户）& o \\
+    All of the above（以上所有）& a \\
+    \hline\hline
+  \end{tabular}
+  \caption{字母表示的权限组}
+  \label{tab:permissionsWithLetters}
+\end{table}
+
+下面我们使用字母来完成上面的任务：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{chmod a+rx /tmp/example}
+\% \textbf{chmod u+w /tmp/example}
+\% \textbf{chmod ug+s /tmp/example}
+\end{Verbatim}
+
+一些用户更喜欢使用字母来设置权限。两种方法的结果都是一致的。
+
+八进制的方法更为迅速，我们经常在shell脚本中看到的也是这种模式。然而有时
+字母模式更为强大。例如，如果想只改变其中一个权限组的权限而保持其它组不
+变，使用八进制数是很困难的。而使用字母模式就很平常。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{ls -l /tmp/}
+-rwxr-xr-x 1 alan users 0 Apr 19 11:21 /tmp/example0 
+-rwxr-x--- 1 alan users 0 Apr 19 11:21 /tmp/example1
+----r-xr-x 1 alan users 0 Apr 19 11:21 /tmp/example2
+\% \textbf{chmod g-rwx /tmp/example?}
+-rwx---r-x 1 alan users 0 Apr 19 11:21 /tmp/example0 
+-rwx------ 1 alan users 0 Apr 19 11:21 /tmp/example1
+-------r-x 1 alan users 0 Apr 19 11:21 /tmp/example2
+\end{Verbatim}
+
+我们在上面提到好几次SetUID及SetGID权限，你可能在想这究竟是什么东西。一
+般来说，在运行一个程序时，系统使用的是你的用户帐号，也就是程序的权限与
+用户所有的权限一致。至于用户组也是一样，在运行一个程序时，使用的是当前
+的用户组。但如果设置了SetUID权限，你就可以强制总是以程序的所有者（如
+``root''用户）的权限运行。SetGID也是一样的，只是应用到用户组而已。
+
+要小心使用这个功能，SetUID和SetGID可能会在你的系统的安全之墙上打开一个
+大洞。如果你将一个\texttt{root}用户的程序设置了SetUID权限，那么就使所
+有用户能以\texttt{root}运行该程序。由于\texttt{root}在系统中是不受限制
+的，我们可以看出，经常为\texttt{root}用户的程序设置SetUID及SetGID对系
+统的安全会造成威胁。简单地说，SetUID和SetGID是好东西，但只按常理使用。
+
+
+\section{链接}
+\label{sec:filesystemStructure:links}
+链接是一种将不同文件名指向同一个文件的方法。使用ln(1)程序，我们就能用
+多个文件名来引用同一个文件。其中的一个文件并不是另一个文件的复本，它们是
+同一个文件，只是名字不同罢了。要彻底删除这个文件，就必须删除它所有的引
+用（rm和其它与之类似的软件实际的原理就是如此。它们只不过是将文件引用删
+除了，释放那部分空间，而不是删除文件的内容。ln会为一个文件创建一个新的
+引用或称为``链接(link)''）。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{ln /etc/slackware-version foo}
+darkstar:~\$ \textbf{cat foo}
+Slackware 12.0.0
+darkstar:~\$ \textbf{ls -l /etc/slackware-version foo}
+-rw-r--r-- 1 root root 17 2007-06-10 02:23 /etc/slackware-version
+-rw-r--r-- 1 root root 17 2007-06-10 02:23 foo
+\end{Verbatim}
+还有另一种链接类型，称为符号链接。与传统链接不同的是，符号链接并不是另
+一个文件的一个引用，它本身就是一个特殊类型的文件。符号链接可以指向一个
+文件或文件夹。符号链接的主要优势在于它不仅能指向文件，还能指向文件夹，
+同时还能跨文件系统操作。生成符号链接使用的参数是[-s]。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{ln -s /etc/slackware-version foo}
+darkstar:~\$ \textbf{cat foo}
+Slackware 12.0.0
+darkstar:~\$ \textbf{ls -l /etc/slackware-version foo}
+-rw-r--r-- 1 root root 17 2007-06-10 02:23 /etc/slackware-version
+lrwxrwxrwx 1 root root 22 2008-01-25 04:16 foo -> /etc/slackware-version
+\end{Verbatim}
+
+使用符号链接时要记得，如果链接指向的文件被删除了，那么这个符号链接也就
+失效了；它就只是指向一个早已经不存在的文件。
+
+使用符号链接时要格外注意。有一次，我在一台机器上工作，但这台机器每次备
+份到磁带时都失败，原因就是我的系统上有两个符号链接，分别在另一个符号链
+接目录下。备份软件就递归地创建两个符号链接，死循环。现在，一般软件在操
+作时都会对这种情况进行检查，但我们例子显然就是例外。
+
+\section{挂载设备}
+\label{sec:filesystemStructure:mouting}
+正如之前第\ref{sec:systemConfig:systemOverview:fileSystemLayout}节中介
+绍的，计算机中的所有驱动及设备都是一个大的文件系统。不同的硬盘分区、
+CDROM、U盘及软盘等都存在于同一个目录树下。要将这些设备附加到文件系统以
+使我们能对它进行访问，我们可以使用\texttt{mount\textbf{(1)}}及
+\texttt{umount\textbf{(1)}}命令。
+
+在计算机启动时，一些设备已经被自动挂载了。这些设备在\path{/etc/fstab}
+文件中列了出来。如果你想对任何设备进行自动挂载，都可以在该文件中加入新
+的条目。而另一些设备，则需要在每次想使用时都运行一次挂载命令。
+
+\subsection{fstab}
+\label{sec:filesystemStructure:mouting:fstab}
+首先先看看\path{/etc/fstab}文件中的内容：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~# \textbf{cat /etc/fstab}
+/dev/hda1        /                ext3        defaults               1   1
+/dev/hda2        /home            ext3        defaults               1   2
+/dev/hda3        swap             swap        defaults               0   0
+/dev/cdrom       /mnt/cdrom       auto        noauto,owner,ro,users  0   0
+/dev/fd0         /mnt/floppy      auto        noauto,owner           0   0
+devpts           /dev/pts         devpts      gid=5,mode=620         0   0
+proc             /proc            proc        defaults               0   0
+\end{Verbatim}
+
+第一列代表设备名。本例中，是一个分为三个区的硬盘，一个CDROM，一个软驱、
+及两个特殊的设备。第二列是这些设备的挂载点，这一列除了swap外，其它都必
+须是目录名。第三列代表设备使用的文件系统类型。对于正常的Linux文件系统，
+这项为\texttt{ext3}（第三代扩展文件系统）。CDROM的类型则为
+\texttt{iso9660}，而基于Windows的设备类型为\texttt{vfat}或
+\texttt{ntfs-3g}。
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 
