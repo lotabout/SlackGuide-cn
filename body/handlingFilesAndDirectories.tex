@@ -1,0 +1,417 @@
+
+\chapter{操作文件及目录}
+\label{chap:handlingFilesAndDirectories}
+
+\rule{\textwidth}{0.1pt}
+
+Linux的目标是尽可能地类Unix。传统上，Unix操作系统是面向命令行的。
+Slackware中的确有图形的用户接口，但命令行仍是控制系统的主要方法。因此，
+理解一些基本文件管理命令是很重要的。
+
+接下来的几节中，我们会解释常见的文件管理命令并举一些使用它们的例子。还
+有许多其它的命令，但我们介绍的命令能让你逐渐上手。另外，我们只对这些命
+令进行简要介绍，要了解这些命令的细节，请查阅命令附带的man手册。
+
+
+\section{导航命令：ls、cd及pwd}
+\label{sec:handlingFilesAndDirectories:navigation}
+
+\subsection{ls}
+\label{sec:handlingFilesAndDirectories:navigation:ls}
+这个命令是``list''的缩写，它的作用是列出一个文件夹中的文件。如果你熟悉
+Windows及DOS，那么ls就像是其中的\texttt{dir}命令。如果不带任何参数，
+\texttt{ls\textbf{(1)}}会列出当前目录下的文件。要查看根目录下的文件，
+可以使用如下命令：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{cd /}
+darkstar~\% \textbf{ls}
+bin   dev  home  lost+found  mnt  proc  sbin  sys  usr
+boot  etc  lib   media       opt  root  srv   tmp  var
+\end{Verbatim}
+
+对于这个输出，多数人的问题是没办法轻易区分哪个是目录，哪个是文件。一些
+用户喜欢让\texttt{ls}在每个列表项的末尾加上一个类型识别符，如：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{cd /}
+darkstar~\% \textbf{ls -FC}
+bin/   dev/  home/  lost/+found/  mnt/  proc/  sbin/  sys/  usr/
+boot/  etc/  lib/   media/       opt/  root/  srv/   tmp/  var/
+\end{Verbatim}
+目录名之后会加上一个反斜杠（`/'），可执行文件名之后会加上一个星号（`*'）
+等等。
+
+\texttt{ls}也可以用来显示其它的文件数据信息。例如，要显示一个文件的创
+建日期、所有者及权限等，可以使用\texttt{ls}显示长列表：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\%\texttt{ls -l}
+# \textbf{ls -l}
+total 88
+drwxr-xr-x   2 root root  4096 Apr 30  2007 bin/
+drwxr-xr-x   2 root root  4096 Jun 19 13:56 boot/
+drwxr-xr-x  15 root root  5180 Jun 21 21:37 dev/
+drwxr-xr-x  78 root root 12288 Jun 21 12:03 etc/
+drwxr-xr-x   4 root root  4096 Feb 28  2011 home/
+drwxr-xr-x   6 root root  4096 Mar 19  2011 lib/
+drwx------   2 root root 16384 Jun 15 21:35 lost+found/
+drwxr-xr-x  16 root root  4096 Jun 21 12:04 media/
+drwxr-xr-x  10 root root  4096 Sep 26  2006 mnt/
+drwxr-xr-x   3 root root  4096 Jun 20 08:25 opt/
+dr-xr-xr-x 110 root root     0 Jun 21 20:03 proc/
+drwx--x---  11 root root  4096 Jun 23 15:28 root/
+drwxr-xr-x   2 root root 12288 Jun 20 08:29 sbin/
+drwxr-xr-x   2 root root  4096 Jun 15 22:12 srv/
+drwxr-xr-x  13 root root     0 Jun 21 20:03 sys/
+drwxrwxrwt   4 root root  4096 Jun 21 09:40 tmp/
+drwxr-xr-x  15 root root  4096 Apr  5  2011 usr/
+drwxr-xr-x  17 root root  4096 Mar 19  2011 var/
+\end{Verbatim}
+
+假设你想得到一个包含隐藏文件的当前目录的列表，可以使用如下命令：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{ls -a}
+./   bin/   dev/  home/  lost+found/  mnt/  proc/  sbin/  sys/  usr/
+../  boot/  etc/  lib/   media/       opt/  root/  srv/   tmp/  var/
+\end{Verbatim}
+以点号开头的文件（也称为点文件）在运行\texttt{ls}命令时会隐藏，只有在
+以\texttt{-a}为参数运行ls才可以看到。
+
+在ls的man手册上可以看到它还有许许多多的选项。运行ls的时候别忘了还可以
+加上选项。
+
+
+\subsection{cd}
+\label{sec:handlingFilesAndDirectories:navigation:cd}
+
+\texttt{cd}命令的作用是改变当前的工作目录。只要输入\texttt{cd}命令，以
+及想要切换到的目录即可。下面是一些例子：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar:~\$ \textbf{cd /bin}
+darkstar:/bin\$ \textbf{cd usr}
+bash: cd: usr: No such file or directory
+darkstar:/bin\$ \textbf{cd /usr}
+darkstar:/usr\$ \textbf{ls}
+bin
+darkstar:/usr\$ \textbf{cd bin}
+darkstar:/usr/bin\$
+\end{Verbatim}
+
+注意到，如果没有前置的斜杠（`/'），则切换目录时是相对于当前目录进行的。
+另外，如果运行\texttt{cd}命令是不带任何参数，则会切换到用户的主目录中。
+
+\texttt{cd}命令与其它命令不同，因为它是一个shell内置的命令。这个特点现
+在对你可能没什么影响，一般而言，这意味着这个命令没有man手册。相反的，
+你可以使用shell的帮助，如下：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{help cd}
+\end{Verbatim}
+它会打印出\textbf{cd}命令可用的选项。
+
+\subsection{pwd}
+\label{sec:handlingFilesAndDirectories:navigation:cd}
+\texttt{pwd}的全称是打印工作目录（print working directory）。它的作用
+就是显示当前位置。使用\texttt{pwd}命令只要输入\textbf{pwd}即可。例子如
+下：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{cd /bin}
+darkstar~\% \textbf{pwd}
+/bin
+darkstar~\% \textbf{cd /usr}
+darkstar~\% \textbf{cd bin}
+darkstar~\% \textbf{pwd}
+/usr/bin
+\end{Verbatim}
+
+\section{分页程序：more、less及most}
+\label{sec:handlingFilesAndDirectories:pagers}
+
+\subsection{more}
+\label{sec:handlingFilesAndDirectories:pagers:more}
+\texttt{more\textbf{(1)}}命令被称为分页工具。有时，一个命令的输出太大
+了，一个屏幕不足以显示。而单独的命令并不知道如何控制输出使它适合在一个
+屏幕上显示。它们将这个任务留给了分页工具。
+
+\texttt{more}命令将其它命令的输出分成几个单独的屏幕，一次输出一个屏幕，
+直到用户按下空格键才输出下一屏，按回车键则向前显示一行。下面是个很好的
+例子：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \texttt{cd /usr/bin}
+darkstar~\% \texttt{ls -l}
+\end{Verbatim}
+
+这个命令的输出会在屏幕上滚动一会。要将该输出一屏一屏的输出，只要用管道
+将它传递给\texttt{more}命令即可：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+darkstar~\% \textbf{ls -l | more}
+\end{Verbatim}
+中间的符号为管道符（`|'），上述管道的含义是将\texttt{ls}的输出作为
+\texttt{more}的输入。除了\texttt{ls}，还可以用管道将其它几乎所有的东西
+传递给\texttt{more}命令。管道在第
+\ref{sec:shell:commandLine:redirectionAndPiping}节中有介绍。
+
+\subsection{less}
+\label{sec:handlingFilesAndDirectories:pagers:less}
+\texttt{more}命令很方便，只是有个致命的缺陷，就是如果翻到下一页就再也
+不能回到上一页。试想如果你在查看一个很大的文件，不小心错过了某一行，那
+就不得不重头查找，急煞人也。好在人们开发了\texttt{less\textbf{(1)}}命
+令，来解决这个问题。它的工作方式与\texttt{more}一样，所以上面的例子在
+这里也适用。所以\texttt{less}的功能远不止\texttt{more}。Joost Kremers
+是这样说的：
+\begin{quote}
+  \texttt{less} is more, but more \texttt{more} than \texttt{more} is,
+  so \texttt{more} is less \texttt{less}, so use more \texttt{less} if
+  you want less \texttt{more}.
+
+  \texttt{less}与\texttt{more}类似，但比\texttt{more}的功能更强大，所
+  以\texttt{more}的功能反而更少，因此，如果你想更少使用\texttt{more}，
+  那么请更多地使用\texttt{less}。
+\end{quote}
+
+\subsection{most}
+\label{sec:handlingFilesAndDirectories:pagers:most}
+\texttt{more}和\texttt{less}已经停止开发了，而
+\texttt{most\textbf{(1)}}继承了它们的衣钵。如果说\texttt{less}是
+\texttt{more}的加强版，那么\texttt{most}就是\texttt{less}的加强版。其
+它的分页程序一次只能查看一个文件，而\texttt{most}能同时查看任意数量的
+文件，前提是每个文件至少两行以上。\texttt{most}提供了很多选项，同样，
+也请自己查阅man手册。
+
+\section{简单输出：cat及echo}
+\label{sec:handlingFilesAndDirectories:simpleOutput}
+
+\subsection{cat}
+\label{sec:handlingFilesAndDirectories:simpleOutput:cat}
+\texttt{cat}(1) 是``concatenate（连接）''的缩写，它最初的设计目的就是
+将多个文件合并成一个文件，但它同时被用于其它的许多目的。
+
+要想将两个或更多的文件合并成一个，只要将想合并文件的文件名传递给
+\texttt{cat}命令，并将输出重定向到另一个文件。\texttt{cat}还能与标准输
+入标准输出协同工作，所以我们需要使用shell的重定向符。照例举个例子：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{cat file1 file2 file3 > bigfile}
+\end{Verbatim}
+这个命令将\texttt{file1}、\texttt{file2}及\texttt{file3}的内容合并在一
+起，最后的输出传递给标准输出，由于使用了重定向，标准输出的内容最终存储
+到\texttt{bigfile}文件中。
+
+我们可以使用\texttt{cat}命令来显示文件的内容。许多人都使用\texttt{cat}
+将文件输出到\texttt{more}或\texttt{less}命令中进行查看，如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{cat file1 | more}
+\end{Verbatim}
+这个命令会显示\texttt{file1}文件的内容，并通过管道将它传递给
+\texttt{more}命令，因此我们就可以一屏一屏地查看该文件。
+
+\texttt{cat}的另一个用法是用来复制文件。例如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{cat /bin/bash > ~/mybash}
+\end{Verbatim}
+执行该命令后，\path{/bin/bash}程序就会被复制到我们的主目录下，并命名为
+\texttt{mybash}。
+
+\texttt{cat}还有许多用法，这里介绍的只是很小的一部分，由于\texttt{cat}
+利用了标准输入及标准输出，因此，它适用于shell脚本中，作为其它复杂命令
+的一部分。
+
+
+\subsection{echo}
+\label{sec:handlingFilesAndDirectories:simpleOutput:echo}
+\texttt{echo}(1)命令的作用是在屏幕上显示特定的文本。我们可以在
+\texttt{echo}命令之后指定要显示的字符串。默认情况下，\texttt{echo}会显
+示我们给出的字符串并在之后打印一个换行符。当然，我们也可以为其传递参数
+\texttt{-n}来告诉\texttt{echo}不打印末尾的新行。\texttt{-e}选项则告诉
+\texttt{echo}解释字符串中的转义符。
+
+\section{新建命令：touch及mkdir}
+\label{sec:handlingFilesAndDirectories:creation}
+
+\subsection{touch}
+\label{sec:handlingFilesAndDirectories:creation:touch}
+\texttt{touch}(1)命令的初衷是修改一个文件的时间戳，使用\texttt{touch}
+命令，我们就可以修改一个文件的访问时间戳及修改时间戳。而如果一个文件之
+前并不存在，则\texttt{touch}会以给定的文件名创建一个空的文件。要将一个
+文件标记为当前的系统时间，只要使用如下命令即可：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{ls -al file1}
+-rw-r--r-- 1 root root 0 Jun 25 10:42 file1
+\% \textbf{touch file1}
+\% \textbf{ls -al file1}
+-rw-r--r-- 1 root root 0 Jun 25 10:43 file1
+\end{Verbatim}
+
+\texttt{touch}命令有很多参数，包括选择修改哪个时间戳、修改成什么时间及
+一些其它的选项。man手册中有详细的介绍。
+
+\subsection{mkdir}
+\label{sec:handlingFilesAndDirectories:creation:mkdir}
+\texttt{mkdir}(1)的作用是创建一个新的目录，使用方法是在\texttt{mkdir}
+后加上想要创建的目录名。下面的例子将会在当前目录下创建一个新的名为
+\texttt{hejaz}的目录：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{mkdir hejaz}
+\end{Verbatim}
+
+当然，我们也可以指定一个路径，如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{mkdir /usr/local/hejaz}
+\end{Verbatim}
+
+\texttt{-p}选项会告诉\texttt{mkdir}创建目录时一同创建它的父目录。例如，
+上面的例子中，如果\path{/usr/local}目录不存在，则这条命令就会执行失败，
+而加上\texttt{-p}选项，则意味着先创建\path{/usr/local}，之后再创建
+\path{/usr/local/hejaz}目录。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{mkdir -p /usr/local/hejaz}
+\end{Verbatim}
+
+\section{复制与移动}
+\label{sec:handlingFilesAndDirectories:copyAndMove}
+
+\subsection{cp}
+\label{sec:handlingFilesAndDirectories:copyAndMove:cp}
+\texttt{cp}命令（copy的缩写）的作用就是复制文件。DOS用户会发现它与DOS
+的\texttt{copy}命令类似。\texttt{cp}命令的选项很多，所以在使用之前还是
+建议查看它的man手册。这里会介绍一些最常用的选项。
+
+首先，\texttt{cp}最常用的方法就是将一个文件复制到另一个位置。如下例：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{cp hejaz /tmp}
+\end{Verbatim}
+这个命令就是将当前目录下的\path{hejaz}文件复制到\path{/tmp}目录下。
+
+许多用户在复制时还希望保留文件的时间戳，如下面的例子：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{cp -a hejaz /tmp}
+\end{Verbatim}
+这个命令就保证了复本的时间戳与原文件一致。
+
+如果想复制整个目录，则使用下面的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{cp -R mydir /tmp}
+\end{Verbatim}
+该命令的效果是将\path{mydir}目录复制到\path{/tmp}目录下。
+
+另外，像前面的例子一样，如果在复制文件或目录的过程中，同时希望保持原文
+件的时间戳，那么使用\texttt{cp -p}命令。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{ls -l file}
+-rw-r--r-- 1 root vlad 4 Jan 1 15:27 file
+\% \textbf{cp -p file /tmp}
+\% \textbf{ls -l /tmp/file}
+-rw-r--r-- 1 root vlad 4 Jan 1 15:27 file
+\end{Verbatim}
+
+\texttt{cp}还有许多其它的选项，请自行参阅man手册。
+
+\subsection{mv}
+\label{sec:handlingFilesAndDirectories:copyAndMove:mv}
+\texttt{mv}命令的作用是将文件从一个位置移动到另一个位置，听起来是不是
+很简单？
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{mv oldfile /tmp/newfile}
+\end{Verbatim}
+
+\texttt{mv}有一些很有用的参数，在man手册中有详细的描述，但实际使用中一
+般几乎不怎么用到。
+
+注意，在Linux，并没有重命名的命令，因此，所有的重命令都是通过
+\texttt{mv}命令实现的。如下面的例子：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{mv oldfile newfile}
+\end{Verbatim}
+该命令的作用就是将当前目录下名为\path{oldfile}的文件重命名为\path{newfile}。
+
+\section{删除命令：rm及rmdir}
+\label{sec:handlingFilesAndDirectories:deletion}
+
+\subsection{rm}
+\label{sec:handlingFilesAndDirectories:deletion:rm}
+
+\texttt{rm}(1)的作用是删除文件及目录树。DOS用户会发现它的功能与DOS下的
+\texttt{del}及\texttt{deltree}命令类似。如果不小心使用，\texttt{rm}可
+能造成意想不到的后果。尽管有一些方法能还原最近删除的文件，但是方法很复
+杂（而且代价昂贵），并且不在本书的范围内。
+
+删除一个单独的文件，只要将文件名传递给\texttt{rm}即可：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{rm file1}
+\end{Verbatim}
+
+如果一个文件没有可写权限，则执行\texttt{rm}时会得到一个提示，说该文件
+是写保护，是否强制删除。如果想跳过这个提示信息，在执行\texttt{rm}时加
+上\texttt{-f}选项，如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{rm -rf file1}
+\end{Verbatim}
+
+如果想删除整个文件夹，可以联合使用\texttt{-r}及\texttt{-f}选项。下面是
+一个例子，教你如何删除整个硬盘，\textbf{请不要在自己的机器上尝试}。下
+面贴出代码：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{rm -rf /}
+\end{Verbatim}
+
+使用\texttt{rm}时一定要小心，不然很可能走火，它也有一些命令行参数，和
+以往一样，在man手册中有详细介绍。
+
+\subsection{rmdir}
+\label{sec:handlingFilesAndDirectories:deletion:rmdir}
+
+\texttt{rmdir}(1)的作用是删除目录，但在删除之前要确保该目录是空的。该
+命令的语法如下：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{rmdir <directory>}
+\end{Verbatim}
+
+下面这个例子的作用是删除当前目录下的\path{hejaz}子目录：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \texttt{rmdir hejaz}
+\end{Verbatim}
+
+如果要删除的目录是不存在的，\texttt{rmdir}会提醒你。你也可以手工指定要
+删除目录的完整路径，如下目录：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{rmdir /tmp/hejaz}
+\end{Verbatim}
+这个命令的作用是将\path{/tmp}目录下的\path{hejaz}目录删除。
+
+还可以通过传递\texttt{-p}选项，在删除一个目录的同时，删除它的父目录。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \texttt{rmdir -p /tmp/hejaz}
+\end{Verbatim}
+这个命令首先删除\path{/tmp}下的\path{hejaz}目录，如果成功删除，则
+\texttt{rmdir}会尝试删除\path{/tmp}目录，\texttt{rmdir}会递归地执行此
+操作直到遇到错误或成功删除整个目录树。
+
+\section{文件别名：ln}
+\label{sec:handlingFilesAndDirectories:aliasing}
+\texttt{ln}(1)（link的缩写）的作用是创建文件间的链接。链接分为硬链接或
+软链接（又称为符号链接）。两种链接的区别在第
+\ref{sec:filesystemStructure:links}节中有介绍。例如我们想创建一个到
+\path{/var/media/mp3}的链接，并将其放在主目录下，那么可以执行如下命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{ln -s /var/media/mp3 ~/mp3}
+\end{Verbatim}
+
+\texttt{-s}选项告诉\texttt{ln}要创建符号链接。下一个参数代表链接源的位
+置，最后一个参数则代表这个链接的名字是什么。这个例子中，我们在主目录下
+创建了一个名为\path{mp3}的文件，指向\path{/var/media/mp3}，通过改变第
+三个参数，你可以为该链接指定任意的名字。
+
+创建一个硬链接则更为容易，只要去掉\texttt{-s}选项即可。但硬链接不允许
+指向目录，或跨越文件系统（即分区）指定，如创建一个名为
+\path{/usr/bin/email}的指向\path{/usr/bin/mutt}的链接，可以输入以下命
+令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{ln /usr/bin/mutt /usr/bin/email}
+\end{Verbatim}
+
+%TODO:详细解释链接的原理及区别
+
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 
