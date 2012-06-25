@@ -1,0 +1,409 @@
+
+\chapter{进程控制}
+\label{chap:processControl}
+\rule{\textwidth}{0.1pt}
+
+每个运行的程序(program)都叫作一个进程(process)。从诸如X Window系统到计
+算机启动时开启的系统程序（守护进程）等属于进程的范畴。每个进行都以一个
+特定的用户运行。计算机启动时运行的进程一般以\texttt{root}用户或是
+\texttt{nobody}用户运行。由我们启动的进行以我们自己为用户运行，而别的
+用户启动的进程则以那些用户运行。
+
+对于那些我们自己启动的进程，我们有着完全的控制。另外，\texttt{root}用
+户控制着整个系统的所有进程，包括所有由别的用户开启的进程。进行的控制及
+监视可以通过一些程序及一些shell命令完成。
+
+\section{后台运行}
+\label{chap:processControl:backgrounding}
+从命令行运行的程序是从前端运行的。这使得我们可以看见程序的所有输出并与
+之交互。然而，另外一些情况下，我们可能希望程序在运行时不控制我们的终端。
+这种行为就叫作后台运行，有好几种方法可以实现后台运行。
+
+第一种方法就是当我们从命令行中启动程序时，在程序之后加上一个`与'号
+（`\&'）。例如，我们希望手动执行\texttt{updatedb}来更新
+\texttt{slocate}的数据库，但由于更新时间较长，我们希望在更新的同时利用
+同一个终端做一些其它的工作，那么，可以执行下面的命令将该命令后台执行：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{updatedb \&}
+\end{Verbatim}
+这个程序会照常运行，当运行结束后正常退出。
+
+另一个后台进行一个进程的方法是在进程运行的过程中对它进行处理。首先，运
+行某个进程，在它运行的过程中，键入Ctrl+Z。这个组合键会挂起当前进程，所
+谓挂起就是暂停了进程，只是暂时停止了运行，之后还能再次启动该进程。一旦
+我们挂起了一个进程，我们就可以通过以下命令来将一个进程转到后台运行：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{bg}
+\end{Verbatim}
+现在挂起的进程就会转入后台运行了。
+
+\section{前台运行}
+\label{chap:processControl:forgrounding}
+如果我们需要和一个后台运行的进程进行交互，那么就需要将它带到前台来运行。
+如果我们只有一个后台运行的进程，那么使用下列命令就能将它带到前台运行：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{fb}
+\end{Verbatim}
+
+如果这个程序的运行尚未结束，那么它会取得我们终端的控制权，而相应的，我
+们就进入了与之交互的界面而暂时得不到shell提示符界面。有时，一个程序在
+后台运行的过程中就结束退出了，这种情况下，我们会得到类似如下的信息：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+[1]+ Done /bin/ls \$LS\_OPTIONS
+\end{Verbatim}
+这个命令告诉我们在后台运行的进程（本例中为\texttt{ls}——没什么意思的进
+程）已经结束了。
+
+我们可以同时拥有几个后台进行的进程。在这种情况下，我们就必需知道想带回
+前台运行的是哪一个进程。只输入\texttt{fg}而不带其它参数只会将最近一个
+进入后台运行的进程带回前台。那么如果我们在后台运行了一大排进程怎么办？
+好在\texttt{bash}为我们提供了一个列出当前所有进行的命令，我们称为
+\texttt{jobs}，它会输出类似下面的信息：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{jobs}
+[1] Stopped          vim
+[2]- Stopped         amp
+[3]+ Stopped         man ps
+\end{Verbatim}
+这个命令显示了后台运行的进程的一个列表。正如我们看到的，后台的所有进程
+的状态都是stopped。这意味着所有的进程都被挂起了。最前面的数字代表后台
+运行进程的某种ID，ID后面带`+'号（本例中为\texttt{man ps}）的意味着如果
+不带任何参数运行\texttt{fg}，则对应的进程将会被带回前台。
+
+如果我们想将\texttt{vim}带回前台，那么对应上述例子，只需输入：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{fg 1}
+\end{Verbatim}
+\texttt{vim}就会被带回前台终端运行。如果我们只有一个通过拨号连接的终端，
+那么后台运行的进程就十分有用。通过后台运行，我们就在一个终端中同时运行
+几个进程，并不时地在它们之间进行切换。
+
+
+\section{ps}
+\label{chap:processControl:ps}
+现在我们已经知道如何在从命令行中启动的进程中来回切换。也正如我们知道的
+那样，系统中总是有进程自始至终在运行。所以，怎么列出这些程序呢？好的，
+我们要用到的是\texttt{ps}(1)命令。这个命令有非常多的选项，我们只介绍最
+常用的一部分。其它的选项请查阅ps的man文件。
+
+只输入\texttt{ps}会得到在当前终端中运行的程序的一个列表。这其中包括当
+前前台运行的进程（意味着包括我们在使用的shell，及\texttt{ps}本身）。当
+然还包括当前后台在运行的进程。很多情况下，我们只会得到如下的非常简短的
+列表：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{ps}
+  PID TTY          TIME CMD
+13995 pts/5    00:00:00 bash
+16262 pts/5    00:00:00 ps
+\end{Verbatim}
+
+尽管这个输出包含的进行不多，但显示的信息是很典型的。不论当前运行的进程
+有多少，得到的输出的列是相同的，那么这些列的含义是什么呢？
+
+\texttt{PID}就是process ID，即进程ID。所有运行中的进程都用一个独一无二
+的标识符来标识，它的范围是1到32767.每个进程都被赋予下个可用的PID。而当
+一个进程退出（或被杀死时，杀死进程在下节中介绍），它会交出自己的PID。
+当达到最大的PID时，会返回，选择从0开始的最小可用PID。
+
+\texttt{TTY}列代表该进程所在的终端。不带任何参数的\texttt{ps}只会列出
+当前终端中运行的程序，所以\texttt{TTY}这一列显示的信息是一致的。正如我
+们看到的，两个进程都运行在\texttt{pts/5}，这意味着它运行在X中的第5个虚
+拟终端中。
+
+\texttt{TIME}并不代表进程运行的时间，而是指进程运行过程中占用的CPU时间。
+还记得Linux是个多任务的操作系统吗？系统中总是有一堆进程在运行着，每个
+进程都获取一小部分的处理器时间。所以\texttt{TIME}列代表每个进程比它所
+需的CPU时间少用了多少。如果我们看到CPU这列中的数值为好几分钟，那么意味
+着什么地方出错了。
+
+最后，\texttt{CMD}列表示我们实际执行的命令。它只列出了程序的名字，而不
+包括调用的参数及类似的信息，我们过会儿会讨论。
+
+只查看我们的进程没什么意思，所有让我们用[-e]参数来看看系统中运行的所有
+程序。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{ps -e}
+  PID TTY          TIME CMD
+    1 ?        00:00:00 init
+    2 ?        00:00:00 kthreadd
+    3 ?        00:00:00 migration/0
+    4 ?        00:00:00 ksoftirqd/0
+    7 ?        00:00:11 events/0
+    9 ?        00:00:01 work_on_cpu/0
+   11 ?        00:00:00 khelper
+  102 ?        00:00:02 kblockd/0
+  105 ?        00:01:19 kacpid
+  106 ?        00:00:01 kacpi_notify
+... many more lines omitted ...
+\end{Verbatim}
+
+上面的例子中使用了标准的ps语法，但是如果我们用BSD语法的话，可以看到到
+多的信息。只要使用[aux]参数就能做到。
+
+\begin{description}
+\item[注意] [aux]参数与[-aux]是不同的，但多数情况下两个参数是等价的。
+  这是N年前的遗留问题了。请查看ps的man手册以了解更多内容。
+\end{description}
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{ps aux}
+USER       PID \%CPU \%MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0   3928   632 ?        Ss   Apr05   0:00 init [3]  
+root         2  0.0  0.0      0     0 ?        S    Apr05   0:00 [kthreadd]
+root         3  0.0  0.0      0     0 ?        S    Apr05   0:00 [migration/0]
+root         4  0.0  0.0      0     0 ?        S    Apr05   0:00 [ksoftirqd/0]
+root         7  0.0  0.0      0     0 ?        S    Apr05   0:11 [events/0]
+root         9  0.0  0.0      0     0 ?        S    Apr05   0:01 [work_on_cpu/0]
+root        11  0.0  0.0      0     0 ?        S    Apr05   0:00 [khelper]
+... many more lines omitted ....
+\end{Verbatim}
+正如你所看到的，BSD语法提供了更多的信息，包括哪个用户在使用某个进程，
+及在ps运行的时候，进程占用的内存及CPU的百分比。
+
+其中，有一些进程的tty为``?''，这代表它们并没有附加到特定的终端中，这对
+于一些守护进程而言最为常见，守护进程在进行时并不附加到特定的终端中，常
+见的一些守护进程有sendmail、BIND、apache及NFS等。典型地，它们从一个客
+户端中监听某些请求，并在接到请求时返回相应的信息。
+
+另外，可以看到一个新列：\texttt{STAT}。它代表进程的状态。其中
+\texttt{S}代表进程处理睡眠状态：这个进程在等待某些事件发生。\texttt{Z}
+代表进程为僵尸进程。僵尸进程指的是一个进程的父进程已经死亡，而子进行仍
+活着。当然这不是什么好事。\texttt{D}代表进行已经进入了不可打断的睡眠状
+态中。一般而言，这些进程即使使用SIGKILL信号都无法杀死。下一节对
+\texttt{kill}的介绍中有关于SIGKILL的更多内容。\texttt{W}代表分页。一个
+死去的进程被标记为\texttt{X}。而一个标记为\texttt{T}的进程代表正在被追
+踪或已经停止了。\texttt{R}则代表访进程是可运行的。
+
+最后，ps还能生成进程树。进程树可以显示什么进程有子进程。结束一个父进程
+的同时也会结束相应的子进程。我们用[-ejH]参数来查看。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{ps -ejH}
+... many lines omitted ...
+ 3660  3660  3660 tty1     00:00:00   bash
+29947 29947  3660 tty1     00:00:00     startx
+29963 29947  3660 tty1     00:00:00       xinit
+29964 29964 29964 tty7     00:27:11         X
+29972 29972  3660 tty1     00:00:00         sh
+29977 29972  3660 tty1     00:00:05           xscreensaver
+29988 29972  3660 tty1     00:00:04           xfce4-session
+29997 29972  3660 tty1     00:00:16             xfwm4
+29999 29972  3660 tty1     00:00:02             Thunar
+... many more lines omitted ...
+\end{Verbatim}
+正如你看到的，不管是查看系统中当前活动的进程，还是了解进程的更多信息而
+言，ps都是一个极其强大的工具。
+
+
+\section{kill}
+\label{chap:processControl:ps}
+有时候，程序的行为与我们的预期不符，这时候我们就要去矫正它。用于这方面
+管理任务的程序名为\texttt{kill}(1)，它能以许多方式控制进程的行为，最明
+显的一种方式当然就是杀死一个进程。例如一个程序已经失控、用尽了系统资源
+或者就是不想让它运行时，我们就需要将进程杀死。
+
+要杀死一个进程，就必需知道进程的PID或进程的名字。要知道进程的PID，可以
+使用我们上一节讨论过的\texttt{ps}命令。例如，要杀死进程号为4747的进程，
+可以使用如下命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{kill 4747}
+\end{Verbatim}
+
+注意，要杀死一个进程，前提就是我们要是这个进程的所有者。这是一个安全性
+特征。如果我们允许杀死其它用户的进程，那么人们就可以做许多恶意的事。当
+然了，\texttt{root}用户可以杀死系统中的任意进程。
+
+\texttt{kill}命令还有另一个变种，名为\texttt{killall}(1)。这个命令的行
+为和名字一致：作用是杀死给定名称的所有运行中的进程。例如，想要杀死所有
+名为\texttt{vim}的运行，只需要输入下面的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{killall vim}
+\end{Verbatim}
+所有我们所拥有的\texttt{vim}进程都会停止。而以\texttt{root}用户运行这
+个命令则会杀死所有用户运行的\texttt{vim}进程。这让我们想到了一种将其它
+所有用户（包括我们自己）踢出系统的方法：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{killall bash}
+\end{Verbatim}
+
+有时，一个通常的\texttt{kill}命令并不能完成任务。有些进程只是用简单的
+\texttt{kill}并不会退出。这时候我们需要一种更强有力的形式来消灭它。假
+如现在PID为4747的进程就是一个顽固的小强，那么我们可以使用如下的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{kill -9 4747}
+\end{Verbatim}
+
+绝大多数情况下，这个命令就可以让PID为4747的进程滚蛋了。当然，
+\texttt{killall}命令也可以这么做。这个命令的独特之处在于它为进程传递了
+一个不同的信号。通常的\texttt{kill}命令传递的是\texttt{SIGTERM}（终止）
+信号，这个信号告诉进程：赶快结束手头的工作，清理后就退出吧。而
+\texttt{kill -9}传递的则是\texttt{SIGKILL}（杀死）信号，直接杀死进程。
+当收到\texttt{SIGKILL}信号时，进程是不允许进行清理的，有时这个信号有一
+些副作用，如数据冲突等。有一系列的信号可供我们使用。我们可以使用如下命
+令得到可用信号的一张列表：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{kill -l}
+ 1) SIGHUP       2) SIGINT       3) SIGQUIT      4) SIGILL       5) SIGTRAP
+ 6) SIGABRT      7) SIGBUS       8) SIGFPE       9) SIGKILL     10) SIGUSR1
+11) SIGSEGV     12) SIGUSR2     13) SIGPIPE     14) SIGALRM     15) SIGTERM
+16) SIGSTKFLT   17) SIGCHLD     18) SIGCONT     19) SIGSTOP     20) SIGTSTP
+21) SIGTTIN     22) SIGTTOU     23) SIGURG      24) SIGXCPU     25) SIGXFSZ
+26) SIGVTALRM   27) SIGPROF     28) SIGWINCH    29) SIGIO       30) SIGPWR
+31) SIGSYS      34) SIGRTMIN    35) SIGRTMIN+1  36) SIGRTMIN+2  37) SIGRTMIN+3
+38) SIGRTMIN+4  39) SIGRTMIN+5  40) SIGRTMIN+6  41) SIGRTMIN+7  42) SIGRTMIN+8
+43) SIGRTMIN+9  44) SIGRTMIN+10 45) SIGRTMIN+11 46) SIGRTMIN+12 47) SIGRTMIN+13
+48) SIGRTMIN+14 49) SIGRTMIN+15 50) SIGRTMAX-14 51) SIGRTMAX-13 52) SIGRTMAX-12
+53) SIGRTMAX-11 54) SIGRTMAX-10 55) SIGRTMAX-9  56) SIGRTMAX-8  57) SIGRTMAX-7
+58) SIGRTMAX-6  59) SIGRTMAX-5  60) SIGRTMAX-4  61) SIGRTMAX-3  62) SIGRTMAX-2
+63) SIGRTMAX-1  64) SIGRTMAX
+\end{Verbatim}
+列表中的数字是调用\texttt{kill}时使用的参数，而后面的名字去掉``SIG''后
+可以用在\texttt{killall}命令中。下面是另一个例子：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{killall -KILL vim}
+\end{Verbatim}
+
+最后介绍一个重启进程的方法。传递\texttt{SIGHUP}信号会导致多数程序重新
+读取它们的配置文件。这对于修改系统配置文件后，告诉系统进程重新读取配置
+文件的情况十分有用。
+
+\section{top}
+\label{chap:processControl:top}
+最后要介绍的命令与之前的不同，它是一个监视系统进程的程序，名为
+\texttt{top}，启动的方式也很简单：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{top}
+\end{Verbatim}
+这个命令会占用整个屏幕，显示当前系统中的运行的进程的信息，以及系统的统
+计信息，包括系统平均负载、进程数量、CPU状态、空闲的内存及进程的详细信
+息等。而进程的详细信息又包括进程的PID、所属用户、优先级、CPU使用信息及
+内在使用信息、运行时间及程序名。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ top
+top - 16:44:15 up 26 days,  5:53,  5 users,  load average: 0.08, 0.03, 0.03
+Tasks: 122 total,   1 running, 119 sleeping,   0 stopped,   2 zombie
+Cpu(s):  3.4\%us,  0.7\%sy,  0.0\%ni, 95.5\%id,  0.1\%wa,  0.0\%hi,  0.2\%si, 0.0\%st
+Mem:   3058360k total,  2853780k used,   204580k free,   154956k buffers
+Swap:        0k total,        0k used,        0k free,  2082652k cached
+
+  PID USER      PR  NI  VIRT  RES  SHR S \%CPU \%MEM    TIME+  COMMAND            
+    1 root      20   0  3928  632  544 S    0  0.0   0:00.99 init               
+    2 root      15  -5     0    0    0 S    0  0.0   0:00.00 kthreadd           
+    3 root      RT  -5     0    0    0 S    0  0.0   0:00.82 migration/0        
+    4 root      15  -5     0    0    0 S    0  0.0   0:00.01 ksoftirqd/0        
+    7 root      15  -5     0    0    0 S    0  0.0   0:11.22 events/0           
+    9 root      15  -5     0    0    0 S    0  0.0   0:01.19 work_on_cpu/0      
+   11 root      15  -5     0    0    0 S    0  0.0   0:00.01 khelper            
+  102 root      15  -5     0    0    0 S    0  0.0   0:02.04 kblockd/0          
+  105 root      15  -5     0    0    0 S    0  0.0   1:20.08 kacpid             
+  106 root      15  -5     0    0    0 S    0  0.0   0:01.92 kacpi_notify       
+  175 root      15  -5     0    0    0 S    0  0.0   0:00.00 ata/0              
+  177 root      15  -5     0    0    0 S    0  0.0   0:00.00 ata_aux            
+  178 root      15  -5     0    0    0 S    0  0.0   0:00.00 ksuspend_usbd      
+  184 root      15  -5     0    0    0 S    0  0.0   0:00.02 khubd              
+  187 root      15  -5     0    0    0 S    0  0.0   0:00.00 kseriod            
+  242 root      20   0     0    0    0 S    0  0.0   0:03.37 pdflush            
+  243 root      15  -5     0    0    0 S    0  0.0   0:02.65 kswapd0
+\end{Verbatim}
+
+它的名字为\texttt{top}的原因是占用CPU最多的程序会在显示在最上面。注意，
+由于\texttt{top}对CPU的占用，在一些当前不活动的系统（及一些当前活动的
+系统）中，top可能会被显示在最前面。然而，\texttt{top}对于查看哪些程序
+失控及需要被杀死是十分有用的。
+
+但如果我们只想查看自己所有的进程，或者其它用户拥有的进程。我们的进程可
+能并不在占用CPU的前几名，可能找不到。所以可以使用\texttt{-u}选项来指定
+要查看的的用户名或用户ID，而只查看相应UID所拥有的所有进程。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{top -u ice}
+  PID USER      PR  NI  VIRT  RES  SHR S \%CPU \%MEM    TIME+  COMMAND            
+16843 ice       20   0  303m  51m  23m S    6  2.5  40:34.26 chrome
+13877 ice       20   0  454m 361m 317m S    3 18.0  14:16.20 VirtualBox
+ 2200 ice       20   0 20364 5880 3516 S    1  0.3   0:25.01 wmfs
+ 2211 ice       20   0  9760 7020 3052 S    0  0.3   0:04.72 python
+ 2397 ice       20   0  3716 1892 1172 S    0  0.1   0:19.16 tmux
+ 7783 ice       20   0  2660 1132  836 R    0  0.1   0:00.02 top
+ 8142 ice       20   0  152m  37m  22m S    0  1.9   1:04.52 okular
+ 2032 ice       20   0  8484 6660 1340 S    0  0.3   0:00.58 bash
+ 2167 ice       20   0  3276 1452 1120 S    0  0.1   0:00.00 startx
+ 2183 ice       20   0  3124  660  564 S    0  0.0   0:00.00 xinit
+ 2188 ice       20   0  3672  732  616 S    0  0.0   0:00.00 ck-launch-sessi
+ 2206 ice       20   0 15412 2916 2320 S    0  0.1   1:36.46 ibus-daemon
+ 2207 ice       20   0  3252 1208  908 S    0  0.1   0:00.00 goagent.sh
+ 2221 ice       20   0 16908 3644 3056 S    0  0.2   0:00.02 ibus-gconf
+ 2227 ice       20   0  127m  24m  14m S    0  1.2   4:13.21 python
+ 2229 ice       20   0 15980 5144 4280 S    0  0.3   0:55.54 ibus-x11
+ 2239 ice       20   0  3636  596  372 S    0  0.0   0:00.00 dbus-launch
+ 2246 ice       20   0  2940  884  664 S    0  0.0   0:00.04 dbus-daemon
+ 2257 ice       20   0  6928 3532 2312 S    0  0.2   0:00.12 gconfd-2
+ 2276 ice       20   0 37252  31m 4440 S    0  1.6   5:27.14 python
+ 2346 ice       20   0 16300 4692 3900 S    0  0.2   0:01.27 xfce4-notifyd
+ 2348 ice       20   0  4000 1800 1588 S    0  0.1   0:00.00 xfconfd
+ 2371 ice       20   0 15524 8928 4192 S    0  0.4   0:02.51 xterm
+ 2377 ice       20   0  5828 4108 1388 S    0  0.2   0:00.25 bash
+ 2395 ice       20   0  3104  972  796 S    0  0.0   0:00.00 tmux
+\end{Verbatim}
+可以看到，我运行了\texttt{top}、\texttt{xterm}及一些其它的与X有关的程
+序，而运行的\texttt{chrome}浏览器是当前最占用CPU的程序。可见，
+\texttt{top}对于监控系统的资源是十分有效的。
+
+\texttt{top}还支持根据进程的PID、是否空闲、是否僵尸进程及其它许多选项
+来监视进程，掌握\texttt{top}的最好方法是查看它的\texttt{man}手册页。
+
+\section{cron}
+\label{sec:processControl:cron}
+
+好的，现在我们学会几种查看系统中活动进程的方法，以及如何向它们发送信号。
+但如果我们想隔一段时间运行一个进程呢？好在Slackware无所不包，crond(8)
+就是用来干这事的。cron按用户计划好的内容为每个用户运行程序。这对于需要
+隔一段时间运行，但又没必要弄成一个守护进程的程序而言十分有用，如备份脚
+本就是这种情况。每个用户都有自己在cron数据库中的条目，所以普通用户也能
+以一定间隔执行某个进程。
+
+要使用cron运行进程，首先需要使用crontab(1)。它的man手册页列出了使用它
+的N种方法，但最常用的方法是使用[-e]参数。这个参数会锁定cron数据库中该
+用户的条目（防止被其它程序覆盖），之后用环境变量VISUAL中指定的编辑器打
+开该条目。在Slackware系统上，一般用的是vi编辑器，在继续操作前你可能想
+先查看一下vi这一章。
+
+cron数据库中的条目看起来可能有点复古，但它们的可定制性很高。除了注释的
+行外，cron会处理每一行，如果所有的时间条件都满足，cron就会执行相应的命
+令。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{crontab -e}
+# Keep current with slackware
+30 02 * * * /usr/local/bin/rsync-slackware64.sh 1>/dev/null 2>\&1
+\end{Verbatim}
+
+就像之前提到的一样，咋一看，cron条目的语法有点难理解，所以我们一部分一
+部分看。从左到右看，每部分依次代表：分钟、小时、日期、月份、周几及命
+令。星号*代表匹配了每一分钟，每一小时，每一天，每月份等等。所以上面的
+例子中，要执行的命令为``/usr/local/bin/rsync-slackware64.sh
+1$>$/dev/null 2$>$\&1''，且在每天上午的2:30分时运行。
+
+crond也能通过e-mail将命令产生的任何输出发送给本地用户。因此，许多任务
+都将它们的输出重定向到了/dev/null，这是一个特殊的设备文件，它会立即抛弃
+所有接收到的东西。为了让你更容易记住这些规则，你可能希望将下面这条注释
+后的规则放到你自己的cron条目中。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# Redirect everything to /dev/null with:
+#   1>/dev/null 2>\&1
+#
+# MIN HOUR DAY MONTH WEEKDAY COMMAND
+\end{Verbatim}
+
+默认情况下，Slackware为root用户的crontab添加了一些条目及相应的注释。它
+根据运行程序的频率在/etc中创建了几个文件夹，而这些条目让我能更方便地设
+置一些需要同期性运行的任务。放到这些文件夹中的脚本会以每小时、每天、
+每周或每个月的频率运行。这些文件夹的名字也很容易看名知意：
+/etc/cron.hourly, /etc/cron.daily, /etc/cron.weekly以及
+/etc/cron.monthly。
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 
