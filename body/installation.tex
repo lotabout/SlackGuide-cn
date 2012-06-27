@@ -2,7 +2,9 @@
 \chapter{安装}
 \label{chap:installation}
 
-\rule[0pt]{\textwidth}{.1pt}
+\begin{flushleft}
+\rule[0mm]{\textwidth}{.1pt}
+\end{flushleft}
 
 使用Slackware前，当然要先获取Slackware并进行安装。不论是购买Slackware
 的CD或是从网上免费下载都是很容易的。只要对自己的电脑有一定的基础知识，
@@ -640,7 +642,8 @@ KDE，或者你压根就不想安装Emacs。注意``A''集合总是必须的。�
 
 \texttt{custom}和\texttt{tag path}选项也是为高级用户而设的。这些选项让
 我们能基于预先制作的tag文件来安装系统。该功能对于批量安装Slackware很有
-帮助，关于使用tag文件的更多信息，请参见第//TODO:Section18.4//节。
+帮助，关于使用tag文件的更多信息，请参见第
+\ref{sec:packageManagement:tagfile}节。
 
 选择了安装方法后，根据不同的方法，会有不同的响应。如果选择的是expert或
 menu，那么会出现一个菜单，让你选择要安装的软件包。如果选择的是full，会
@@ -651,7 +654,7 @@ menu，那么会出现一个菜单，让你选择要安装的软件包。如果�
 注意，安装时可能会出现磁盘空间不足，如果你选择了太多的包，而对应安装位
 置的剩余空间不足，就会出现问题。最安全的方法是先选择一些包，之后再添加
 其它的包。这可以通过使用slackware的包管理工具轻松完成。关于这些内容，
-参见第//TODO:Chapter18//章。
+参见第\ref{chap:packageManagement}章。
 
 \subsection{配置}
 \label{sec:installation:setup:configure}
@@ -678,9 +681,8 @@ Slackware不能启动。如果你的机器支持从USB设备启动（现在的�
 \end{figure}
 
 \subsubsection{LILO}
-\label{sec:installation:setup:configure:lilo}
-这里，会提示是否安装LILO（the LInux LOader；详情参见第//TODO:Section
-7.1//节）
+\label{sec:installation:setup:configure:lilo}这里，会提示是否安装
+LILO（the LInux LOader；详情参见第\ref{sec:booting:lilo}节）
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{images/installation/setup-lilo.eps}
@@ -689,7 +691,7 @@ Slackware不能启动。如果你的机器支持从USB设备启动（现在的�
 \end{figure}
 如果系统中只安装了Slackware，那么选择\texttt{simple}就可以了。如果你安
 装的是双系统（或多系统），那么使用\texttt{expert}选项会更好一些。关于
-双系统启动，请参见第//TODO:Section 7.3//节以获取更多信息。我们不推荐你
+双系统启动，请参见第\ref{sec:booting:lilo}节以获取更多信息。我们不推荐你
 使用第三个选项\texttt{do not install}，除非你知道自己在干什么，知道自
 己为什么不需要安装LILO。如果选择的是\texttt{expert}选项，会有提示选择
 LILO的安装位置，通常可以选择将其安装在硬盘的MBR（主引导记录）中，Linux
@@ -772,8 +774,8 @@ LILO的安装位置，通常可以选择将其安装在硬盘的MBR（主引导�
 \subsubsection{X 窗口管理器}
 \label{sec:installation:setup:configure:xWindowManager}
 
-通过本节，我们就可以选择默认的X窗口管理器，参见第//TODO:Chapter 6://章
-以获取关于X及窗口管理器的更多知识。
+通过本节，我们就可以选择默认的X窗口管理器，参见第
+\ref{chap:xconfiguration}章以获取关于X及窗口管理器的更多知识。
 \begin{figure}[htpb]
   \centering
   \includegraphics[width=0.8\textwidth]{images/installation/setup-xwmconfig.eps}

@@ -2,7 +2,9 @@
 \chapter{X的相关配置}
 \label{chap:xconfiguration}
 
-\rule[0pt]{\textwidth}{0.1pt}
+\begin{flushleft}
+\rule[0mm]{\textwidth}{.1pt}
+\end{flushleft}
 
 \section{什么是X}
 \label{chap:xconfiguration:whatis}
@@ -274,10 +276,11 @@ fi
 正如我们看到的，\path{rc.4}先检查\texttt{gdm}的存在与否及是否可执行，如
 果存在且可执行则执行gdm，之后检查\texttt{kdm}，最后是\texttt{xdm}。选
 择登陆管理器的一个方法就是用\texttt{removepkg}把不想要的管理器删除。关
-于\texttt{removepkg}的内容请参见第章。%TODO:REF chap18
+于\texttt{removepkg}的内容请参见第
+\ref{sec:packageManagement:utilities:removepkg}章。
 
 当然，我们也可以把不想使用的管理器的可执行权限取消了。\texttt{chmod}命
-令会在第章中介绍。%TODO: REF chap19
+令会在第\ref{sec:filesystemStructure:permission}节中介绍。
 \begin{Verbatim}[frame=single, commandchars=\\\{\}]
 darkstar~# \textbf{chmod -x /usr/bin/gdm}
 \end{Verbatim}

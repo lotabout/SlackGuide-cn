@@ -1,7 +1,10 @@
 
 \chapter{进程控制}
 \label{chap:processControl}
-\rule{\textwidth}{0.1pt}
+
+\begin{flushleft}
+\rule[0mm]{\textwidth}{.1pt}
+\end{flushleft}
 
 每个运行的程序(program)都叫作一个进程(process)。从诸如X Window系统到计
 算机启动时开启的系统程序（守护进程）等属于进程的范畴。每个进行都以一个
@@ -14,7 +17,7 @@
 监视可以通过一些程序及一些shell命令完成。
 
 \section{后台运行}
-\label{chap:processControl:backgrounding}
+\label{sec:processControl:backgrounding}
 从命令行运行的程序是从前端运行的。这使得我们可以看见程序的所有输出并与
 之交互。然而，另外一些情况下，我们可能希望程序在运行时不控制我们的终端。
 这种行为就叫作后台运行，有好几种方法可以实现后台运行。
@@ -38,7 +41,7 @@
 现在挂起的进程就会转入后台运行了。
 
 \section{前台运行}
-\label{chap:processControl:forgrounding}
+\label{sec:processControl:forgrounding}
 如果我们需要和一个后台运行的进程进行交互，那么就需要将它带到前台来运行。
 如果我们只有一个后台运行的进程，那么使用下列命令就能将它带到前台运行：
 \begin{Verbatim}[frame=single, commandchars=\\\{\}]
@@ -80,7 +83,7 @@
 
 
 \section{ps}
-\label{chap:processControl:ps}
+\label{sec:processControl:ps}
 现在我们已经知道如何在从命令行中启动的进程中来回切换。也正如我们知道的
 那样，系统中总是有进程自始至终在运行。所以，怎么列出这些程序呢？好的，
 我们要用到的是\texttt{ps}(1)命令。这个命令有非常多的选项，我们只介绍最
@@ -196,7 +199,7 @@ darkstar:~\$ \textbf{ps -ejH}
 
 
 \section{kill}
-\label{chap:processControl:ps}
+\label{sec:processControl:ps}
 有时候，程序的行为与我们的预期不符，这时候我们就要去矫正它。用于这方面
 管理任务的程序名为\texttt{kill}(1)，它能以许多方式控制进程的行为，最明
 显的一种方式当然就是杀死一个进程。例如一个程序已经失控、用尽了系统资源
@@ -268,7 +271,7 @@ darkstar:~\$ \textbf{ps -ejH}
 文件的情况十分有用。
 
 \section{top}
-\label{chap:processControl:top}
+\label{sec:processControl:top}
 最后要介绍的命令与之前的不同，它是一个监视系统进程的程序，名为
 \texttt{top}，启动的方式也很简单：
 \begin{Verbatim}[frame=single, commandchars=\\\{\}]
