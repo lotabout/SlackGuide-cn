@@ -1,0 +1,259 @@
+
+\chapter{安全性}
+\label{chap:security}
+
+\rule{\textwidth}{0.1pt}
+
+任何系统中，安全性都是极为重要的。安全性意味着可以防止别人对我们的机器
+攻击，同时保护敏感数据。本章的内容就是如何保护Slackware的安全，防止恶
+意脚本、破解、及流氓程序。请记住，这只是保护一个系统的开始，安全是一个
+过程而不是一个状态。
+
+\section{关闭服务}
+\label{chap:security:disablingServices}
+安装完Slackware后的第一件事应该是关闭那些你不需要的服务。还记得这个说
+法吗？服务越多则安全性越低。每个服务都可能增加安全隐患，所以我们要尽可
+能少开启服务（即只开启我们需要的服务）。服务主要从两个地方开
+启——\texttt{inetd}及启动脚本。
+
+\subsection{inetd开启的服务}
+\label{chap:security:disablingServices:inetd}
+Slackware的许多守护进程都是由\texttt{inetd}(8)开启的。\texttt{inetd}本
+身就是一个守护进程，有许多服务被设置为由\texttt{inetd}启动，而
+\texttt{inetd}就负责监听这些服务用到的端口，当接收到一个连接请求时，
+\texttt{inetd}就创建该服务对应守护进程的一个实例。由\texttt{inetd}启动
+的守护进程可以通过注释掉\path{/etc/inetd.conf}文件中的相应行来关闭。用
+你习惯的文本编辑器（如\texttt{vi}）打开该文件，你会看到类似下面的行：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+telnet stream tcp nowait root /usr/sbin/tcpd in.telnetd
+\end{Verbatim}
+我们可以关闭该服务，以及其它不需要的服务，只要将这行注释掉（在行首加上
+\#号）即可。注释后如下所示：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+#telnet stream tcp nowait root /usr/sbin/tcpd in.telnetd
+\end{Verbatim}
+
+在\texttt{inetd}重启之后，这些服务就会被关闭，可以通过如下命令来重启
+\texttt{inetd}：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{kill -HUP \$(cat /var/run/inetd.pid)}
+或
+# \textbf{/etc/rc.d/rc.inetd restart}
+\end{Verbatim}
+
+\subsection{启动脚本开启的服务}
+\label{chap:security:disablingServices:init}
+剩下的一些服务是由\path{/etc/rc.d/}目录下的启动脚本开启的。这些服务可
+以通过两种方法禁用。第一种是去除相应脚本的可执行权限，第二种则是在初始
+化脚本中注释掉对应的行。
+
+例如，SSH服务是由单独的初始化脚本\path{/etc/rc.d/rc.sshd}开启的，我们
+可以使用如下命令禁用它：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{chmod -x /etc/rc.d/rc.sshd}
+\end{Verbatim}
+
+而对于没有单独启动脚本的一些服务，我们就必须在相应的启动脚本中注释相应
+的行，才能禁用它们。例如：portmap守护进程是在\path{/etc/rc.d/rc.inet2}
+脚本中的下列行中启动的\footnote{本服务在Slackware 13.37中不再是由此方
+  法启动的。}：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# This must be running in order to mount NFS volumes.
+# Start the RPC portmapper:
+if [ -x /sbin/rpc.portmap ]; then
+  echo "Starting RPC portmapper: /sbin/rpc.portmap"
+  /sbin/rpc.portmap
+fi
+# Done starting the RPC portmapper.
+\end{Verbatim}
+我们可以通过在相应语句前加上\texttt{\#}号注释来禁用它。如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# This must be running in order to mount NFS volumes.
+# Start the RPC portmapper:
+#if [ -x /sbin/rpc.portmap ]; then
+# echo "Starting RPC portmapper: /sbin/rpc.portmap"
+# /sbin/rpc.portmap
+#fi
+# Done starting the RPC portmapper.
+\end{Verbatim}
+
+做完以上的工作，只有在下次重启或切换到运行级别3或4时才会生效。我们可以
+在终端中输入下面的命令来进行切换（切换到运行级别1后要重新登陆）：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{telinit 1}
+# \textbf{telinit 3}
+\end{Verbatim}
+
+
+\section{主机访问控制}
+\label{chap:security:hostAccessControl}
+
+\subsection{iptables}
+\label{chap:security:hostAccessControl:iptables}
+\texttt{iptables}是2.4及以上版本的内核中的包过滤配置程序。Slackware第
+一个使用2.4内核（准确的说是2.4.5）的版本是8.0，而在Slackware 8.1中默认
+使用它。本书中只对它的基本用法进行介绍，全面的介绍请参考
+\url{http://www.netfilter.org}。这些iptables命令可以写入
+\path{/etc/rc.d/rc.firewall}文件\footnote{Slackware 13.37中默认没有该
+  文件，我们可以手工创建，它会由\texttt{rc.inet2}进行调用。}，当然，要
+默认启动的话，还需要为其设置可执行权限。注意，错误的\texttt{iptables}
+命令可能会锁住机器，连自己都进不去。因此，除非你对自己100\%自信，否则
+最少保证自己能有个本地访问的权限。
+
+多数人会做的第一件事就是用DROP为每个内部链路设置默认策略：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{iptables -P INPUT DROP}
+# \textbf{iptables -P FORWARD DROP}
+\end{Verbatim}
+这个命令的作用是阻止一切，现在我们可以开始逐渐开放权限。我们第一件要做
+的事就是允许传递已建立会话(sessioin)的数据：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT}
+\end{Verbatim}
+
+为了保证那些使用环回地址进行通信的程序能正常工作，一般添加下面的规则是
+比较明智的：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{iptables -A INPUT -s 127.0.0.0/8 -d 127.0.0.0/8 -i lo -j ACCEPT}
+\end{Verbatim}
+
+这个规则允许了所有通过回环接口（lo）传递给127.0.0.0/8（即
+127.0.0.0-127.255.255.255）的数据包。创建规则的时候越具体越好，这样可
+以防止不小心给潜在的威胁留下漏洞。但每条规则允许的东西少了，也就意味着
+我们要创建更多的规则。
+
+接下来我们要做的就是允许访问我们机器上运行的一些特定服务。例如，我们想
+在我们的机器上运行一个网页服务器，我们就要用类似下面的规则：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{iptables -A INPUT -p tcp --dport 80 -i ppp0 -j ACCEPT}
+\end{Verbatim}
+这条规则允许其它机器通过\texttt{ppp0}接口访问我们机器的80号端口。我们
+也可能只想让一部分机器访问这些服务。下面的规则则只允许从
+\url{64.57.102.34}访问我们的网页服务器：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{iptables -A INPUT -p tcp -s 64.57.102.34 --dport 80 -i ppp0
+  -j ACCEPT}
+\end{Verbatim}
+
+如果想用于检测一些网络问题，允许ICMP通信是比较有用的。我们可以通过类似
+下面的规则来完成这个任务：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{iptables -A INPUT -p icmp -j ACCEPT}
+\end{Verbatim}
+
+多数人可能还想在它们作为网关的机器建立网络地址转换（NAT）服务，那么它
+所有的内网就可以通过该机器访问网络了。我们可以使用下面的规则：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE}
+\end{Verbatim}
+
+当然，我们还需要启用IP转发功能。如果想临时开启，那么使用下面的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+  # \textbf{echo 1 > /proc/sys/net/ipv4/ip_forward}
+\end{Verbatim}
+
+如果想在每次开机时都启动IP转发功能，那么可以为
+\path{/etc/rc.d/rc.ip_forward}添加可执行权限：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{chmod +x /etc/rc.d/rc.ip_forward}
+\end{Verbatim}
+
+更多关于NAT的信息，请参见NAT
+HOWTO\footnote{\url{http://www.netfilter.org/documentation/HOWTO/NAT-HOWTO.txt}}
+
+\subsection{tcpwrappers}
+\label{chap:security:hostAccessControl:tcpwrappers}
+\texttt{tcpwrapper}是在软件层执行访问控制而非IP层。当IP层的访问控制
+（即Netfilter）出现异常时，它可以提供额外的保护层。例如，如果你重新编
+译了内核，忘了开启iptables支持，则IP层的访问控制就会失效，这时候
+\texttt{tcpwrappers}仍旧可以对系统进行保护。
+
+由\texttt{tcpwrapper}提供的保护服务可以由\path{/etc/hosts.allow}及
+\path{/etc/hosts.deny}文件进行控制。
+
+多数人的\path{/etc/hosts.deny}中只有一行，用来默认阻止所有的访问，这行
+看起来可能像下面这样：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+ALL : ALL
+\end{Verbatim}
+
+当我们用上面的方法默认阻止所有访问时，我们就可以指定那些我们允许的主机、
+域名或一个范围的IP，赋予它们访问的权限。这可以通过
+\path{/etc/hosts.allow}文件达成，它的语法和前面一致。
+
+例如，许多人会允许所有对回环地址的访问，则可以在
+\path{/etc/hosts.allow}文件中添加如下规则：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+ALL : 127.0.0.1
+\end{Verbatim}
+
+而要允许从\url{192.168.0.0/24}地址段的机器访问SSHd，则可以使用下列任意
+规则之一：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+sshd : 192.168.0.0/24
+ssh  : 192.168.0.
+\end{Verbatim}
+
+我们还能限定某个域名对主机的访问权限。这可以用下面的规则实现（注意，这
+个方法依赖于DNS的反向解释，所以除非DNS服务器是可信赖的，否则效果不好，
+所以我们不建议你在因特网上使用该规则。）：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+sshd : .slackware.com
+\end{Verbatim}
+
+\section{保持最新状态}
+\label{chap:security:keepingCurrent}
+
+\subsection{slackware-security邮件列表}
+\label{chap:security:keepingCurrent:mailingList}
+当某个安全问题影响到Slacwkare时，Slackware官方会对所有订阅了
+\url{slackware-security@slackware.com}邮件列表的用户发送一封邮件。而除
+了在\path{/extra}和\path{/pasture}中的软件，Slackware中其它软件的报告
+会被发送给那些志愿进行修改的志愿者。这些安全声明通常会包括软件包更新后
+的信息，如果有一些解决方法的话，也会包含其中。
+
+如何订阅这些邮件已经在第\ref{sec:help:onlineHelp:mailingLists}节中介绍过了。
+
+\subsection{/pasture目录}
+\label{chap:security:keepingCurrent:pasture}
+当一个更新后的软件包在一个新的Slackware版本发行的时候（如果它已经包含在
+Slackware之前的版本中，那么通常意味着新的版本只是修复了某些安全问题），
+那么Slackware会把它放在\path{/pastures}目录。具体的目录根据你用的镜像
+站点不同而不同。
+
+在安装这些软件包之前，最好先检查它们的\texttt{md5sum}。
+\texttt{md5sum}(1)是一个命令行工具，它可以方便地为一个文件生成一个唯一
+的散列值。如果一个文件的某一位发生了改变，它的md5sum值也会有很大的不同。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{md5sum package-<ver>-<arch>-<rev>.tgz}
+6341417aa1c025448b53073a1f1d287d package-<ver>-<arch>-<rev>.tgz
+\end{Verbatim}
+
+得到md5sum值后，我们可以与\path{CHECKSUMS.md5}文件中的对应包的md5sum值
+进行比较。\path{CHECKSUMS.md5}文件位于\texttt{slackware-\$VERSION}目录
+下（也在\path{/patches}目录下）或都在 \texttt{slackware-security} 邮件列
+表的邮件中。
+
+如果你有一个包含了各个包的md5sum值的文件，那么可以使用\texttt{md5sum}
+的[\texttt{-c}]参数。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+# \textbf{md5sum -c CHECKSUMS.md5}
+./ANNOUNCE.10_0: OK
+./BOOTING.TXT: OK
+./COPYING: OK
+./COPYRIGHT.TXT: OK
+./CRYPTO_NOTICE.TXT: OK
+./ChangeLog.txt: OK
+./FAQ.TXT: FAILED
+\end{Verbatim}
+
+正如我们看到的，\texttt{md5sum}检查正确的文件都以``OK''列出，而MD5值不
+通过的则标记为``FAILED''。（这个解释是在侮辱您的智商，为什么你还能忍得
+了？）
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 
