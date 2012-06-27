@@ -1,0 +1,174 @@
+
+\chapter{文件归档}
+\label{chap:archiveFiles}
+
+\rule{\textwidth}{0.1pt}
+
+\section{gzip}
+\label{sec:archiveFiles:gzip}
+
+\texttt{gzip}(1)是GNU的压缩程序。它的作用是压缩一个单独的文件。基本用
+法如下：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{gzip filename}
+\end{Verbatim}
+
+这个命令的结果是文件\texttt{filename}变成了\texttt{filename.gz}，而且
+文件大小一般比原文件要小。注意，使用gzip，\texttt{filename.gz}会覆盖
+\texttt{filename}。这意味着\texttt{filname}文件不再存在。这个压缩算法
+对于普通的文本文件效果不错，但对于jpeg图像、mp3及其它一些文件，由于它
+们本身就已经压缩过了，所以效果不是很好。一般使用到的参数是用来控制压缩
+大写与压缩时间的平衡的。例如，要得到最大的压缩率，可以用下面的命令：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{gzip -9 filename}
+\end{Verbatim}
+这个命令需要花更多的时间来压缩文件，但比之前的命令得到的文件大小要更小。
+而用更小的命令行参数则代表更少的压缩时间，但压缩后的大小更大。
+
+解压缩一个\texttt{gzip}后的文件可以使用两个命令，但它们实际上是同一个
+程序。\texttt{gzip}本身也可以解压缩某些扩展名的文件。这些扩展名包括：
+\texttt{.gz}、\texttt{-gz}、\texttt{.z}、\texttt{-z}、\texttt{.Z}或
+\texttt{-Z}。第一个方法是使用\texttt{gunzip}(1)来解压缩一个文件，如：
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+\% \textbf{gunzip filename.gz}
+\end{Verbatim}
+这个命令是\texttt{gzip filename}的逆过程，结果就是\texttt{filename.gz}
+文件被解压后的\texttt{filename}文件取代。\texttt{gunzip}其实是
+\texttt{gzip}的一部分，与\texttt{gzip -d}命令等价。因此，\texttt{gzip}
+一般发音为\texttt{gunzip}，因为听起来更牛。
+
+假设这样一种情况，我们想将解压后的文件内容传递给其它程序，但不想删除碑
+的压缩文件，要怎么办？\texttt{zcat}命令会读取gzip文件的内容，在内存中解
+压，并将解压后的内容传递到标准输出（除非你重定向了，否则指的是终端的屏
+幕，重定向的内容参见第\ref{sec:shell:commandLine:redirectionAndPiping}
+节）中。
+
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{zcat /tmp/large_file.gz}
+Wed Aug 26 10:00:38 CDT 2009
+Slackware 13.0 x86 is released as stable!  Thanks to everyone who helped
+make this release possible -- see the RELEASE_NOTES for the credits.
+The ISOs are off to the replicator.  This time it will be a 6 CD-ROM
+32-bit set and a dual-sided 32-bit/64-bit x86/x86_64 DVD.  We're taking
+pre-orders now at store.slackware.com.  Please consider picking up a copy
+to help support the project.  Once again, thanks to the entire Slackware
+community for all the help testing and fixing things and offering
+suggestions during this development cycle.
+\end{Verbatim}
+
+\section{bzip2}
+\label{sec:archiveFiles:bzip2}
+\textbf{bzip2}(1)是\texttt{gzip}的一个替代品，但工作的方式与
+\texttt{gzip}几乎一样，只是扩展名变为\texttt{.bz2}。\texttt{bzip2}鼓吹
+自己拥有更大的压缩率。但不幸的是，要达到更大的压缩率，往往花的时间更多，
+因此\texttt{bzip2}一般比其它同类产品运行更长的时间。
+
+\section{XZ/LZMA}
+\label{sec:archiveFiles:bzip2}
+最近一个加入Slackware的压缩工具是xz，它实现的算法是LZMA压缩算法。它比
+bzip2更快且压缩得更好。事实上，由于它的速度快，质量好的特性，Slackware
+已经用它取代gzip作为默认的压缩方案。不幸的是，直到写这篇文章为止，
+xz还没有man手册页\footnote{译者翻译时已经有man手册页了，2012年6月}，所
+以想要查看它的选项，只能使用[--help]参数来查看。压缩文件用[-z]参数，解
+压用[-d]参数。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{xz -z /tmp/large_file}
+\end{Verbatim}
+
+\section{tar}
+\label{sec:archiveFiles:tar}
+很好，现在我们知道了怎么使用各种压缩软件来对文件进行压缩，但它们中没有
+一个能像zip一样对文件进行归档。直到现在为止。磁带归档器（Tape
+Archiver），或者称为tar(1)，是Slackware中最经常用到的归档程序。如同其
+它归档软件， tar会生成一个单独的包含其它文件或文件夹的文件。默认情况下
+它并不对生成的文件（一般称为``tarball''）进行压缩； 然而，Slackware中
+包含的这个版本的tar支持很多压缩方案，包括上面提到的林林种种。
+
+调用tar可以很简单，也可以是很复杂，一切都看你喜欢。一般的，创建一个
+tarball的参数是[-cvzf]。我们将更深入的讨论。
+\begin{table}[htpb]
+  \centering
+% begin receive orgtbl tarArguments
+\begin{tabular}{r|l}
+\hline\hline
+参数 & 意义 \\ \hline
+c & 创建一个tarball \\
+x & 提取tarball的内容 \\
+t & 显示tarball的内容 \\
+v & 显示详细信息 \\
+z & 使用gzip进行压缩 \\
+j & 使用bzip2进行压缩 \\
+J & 使用LZMA进行压缩 \\
+p & 保留权限设置 \\
+\hline\hline
+\end{tabular}
+% end receive orgtbl tarArguments 
+  \caption{tar的各种参数}
+  \label{tab:tarArguments}
+\end{table}
+
+\begin{comment}
+#+ORGTBL: send tarArguments orgtbl-to-latex 
+|------+-------------------|
+| 参数 | 意义              |
+|------+-------------------|
+| c    | 创建一个tarball   |
+| x    | 提取tarball的内容 |
+| t    | 显示tarball的内容 |
+| v    | 显示详细信息      |
+| z    | 使用gzip进行压缩  |
+| j    | 使用bzip2进行压缩 |
+| J    | 使用LZMA进行压缩  |
+| p    | 保留权限设置      |
+|------+-------------------|
+\end{comment}
+
+相对于其它的程序，tar参数的顺序要求更为准确。例如，在读取或写入一个文
+件时，必须要加[-f]参数，并且文件名要紧接着这个参数，考虑下面这个例子。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{tar -xvzf /tmp/tarball.tar.gz}
+darkstar:~\$ \textbf{tar -xvfz /tmp/tarball.tar.gz}
+\end{Verbatim}
+
+上述两个例子中，第一个例子得到的结果和预期的一致，但第二个却不行，因为
+这样的参数意味着让tar打开一个名为\texttt{z}的文件，而不是预期的
+\texttt{/tmp/tarball.tar.gz}文件。
+
+我们已经对参数进行了强调，现在让我们通过几个例子学习如何创建及提取
+tarball。正如我们之前讲到的[-c]参数代表创建一个tarball，[-x]参数代表提
+取tarball的内容。然而，如果我们想创建一个压缩的tarball，或对提取一个压
+缩后的tarball中的内容，我们就必须指定正确的压缩方案。自然的，如果压根
+不想对tarball进行压缩，那么可以把这些选项丢在一边。下面的命令使用gzip
+压缩算法自寻一个新的tarball。一个不成文的规定是在所有的tarball文件名中
+选加一个\textbf{.tar}的扩展名，再加一个所使用的压缩算法的扩展名。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{tar -czf /tmp/tarball.tar.gz /tmp/tarball/}
+\end{Verbatim}
+
+\section{zip}
+\label{sec:archiveFiles:zip}
+.zip这个扩展名不陌生吧。这些文件是把其它的文件和文件夹压缩后得到的。尽
+管你在Linux中不常用到，它们在其它操作系统中仍经常使用，所以我们有时还
+是会碰到。
+
+要创建一个zip文件，你（很自然地）需要zip(1)命令。你可以用zip命令压缩一
+整个文件或文件夹，只是压缩文件夹时，要用[-r]命令来使zip递归压缩文件夹
+中的内容。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{zip -r /tmp/home.zip /home}
+darkstar:~\$ \textbf{zip /tmp/large_file.zip /tmp/large_file}
+\end{Verbatim}
+
+参数的顺序是非常重要的，第一个文件名必需是要创建的zip文件（如果你不
+写.zip扩展名，zip命令会自动帮你添上），剩下的参数是要加入这个zip的文件
+或文件夹。
+
+很自然地，unzip(1)命令用来解压一个zip归档文件。
+\begin{Verbatim}[frame=single, commandchars=\\\{\}]
+darkstar:~\$ \textbf{unzip /tmp/home.zip}
+\end{Verbatim}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../SlackGuide"
+%%% End: 
