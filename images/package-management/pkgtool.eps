@@ -1,0 +1,68 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: 21 60 467 276
+
+/Outterbox
+{ newpath moveto
+0 208 rlineto
+75 0 rlineto
+23 61 moveto
+443 0 rlineto
+0 208 rlineto
+-90 0 rlineto
+23 87 moveto
+443 0 rlineto
+closepath } def
+
+/Innerbox
+{ moveto
+420 0 rlineto
+0 105 rlineto
+-420 0 rlineto
+closepath} def
+
+/TitleFont
+{ /Helvetica findfont 13 scalefont setfont
+moveto } def
+
+/PanelFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ContentFont
+{ /Helvetica findfont 12 scalefont setfont
+moveto } def
+
+/ButtonFont
+{ /Helvetica findfont 11 scalefont setfont
+moveto } def
+
+23 61 Outterbox
+34 100 Innerbox
+
+100 266 TitleFont(Slackware Package Tool (pkgtool version 9.1.0)) show
+
+34 245 PanelFont (Welcome to the Slackware package tool.) show
+34 220 PanelFont (Which option would you like?) show
+
+74 191 ContentFont (Current) show
+74 177 ContentFont (Other) show
+74 163 ContentFont (Floppy) show
+74 149 ContentFont (Remove) show
+74 135 ContentFont (View) show
+74 121 ContentFont (Setup) show
+74 107 ContentFont (Exit) show
+
+129 191 ContentFont (Install packages from the current directory) show
+129 177 ContentFont (Install packages from some other directory) show
+129 163 ContentFont (Install packages from floppy disks) show
+129 149 ContentFont (Remove packages that are currently installed) show
+129 135 ContentFont (View the list of files contained in a package) show
+129 121 ContentFont (Choose Slackware installation scripts to run again) show
+129 107 ContentFont (Exit Pkgtool) show
+
+153 71 ButtonFont (<  OK  >) show
+267 71 ButtonFont (< Cancel >) show
+
+stroke
+showpage
+%%EOF
