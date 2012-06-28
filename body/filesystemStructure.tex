@@ -273,6 +273,71 @@ proc             /proc            proc        defaults               0   0
 
 安装Slackware时，setup程序会自动创建\texttt{fstab}的大部分内容。
 
+\subsection{本地文件系统类型}
+\label{sec:filesystemStructure:mouting:filesystemTypes}
+Linux内核支持的文件系统很多，这意味着我们有很长的一张表可以选择。幸运
+的是大多数默认的文件系统类型就能满足我们的要求了。其中一些文件系统类型
+适合于特定的媒体类型。例如，\texttt{iso9660}文件系统几乎只用于CD和DVD
+类型。
+\begin{description}
+\item[ext2] \hfill \\
+  \texttt{ext2}是Slackware中最古老的文件系统，用于在硬盘上存储数据。与其它文件
+  系统相比，\texttt{ext2}是相当简单的一个。在读取和写入数据时，它比其
+  它多数系统的速度要快，但它不含有任何的日志系统。这意味着如果系统崩溃，
+  那么就要检查每一个数据块才能发现并修复（幸运的话）错误。
+\item[ext3] \hfill \\
+  \texttt{ext3}是\texttt{ext2}的小表哥，多数情况下，可以使用
+  \texttt{ext3}来取代ext2，它们有许多共同的代码，但\texttt{ext3}的一个
+  优势就是它有日志系统。事实上，\texttt{ext3}和\texttt{ext2}是如此之像，
+  以致于可以在不损失任何数据的情况下从一个文件系统转换成另一个。也因此
+  \texttt{ext3}大受欢迎。还有一些工具是用来在一个灾难性的硬件崩溃中，
+  从\texttt{ext3}文件系统中恢复数据。ext3的一个瑕疵就是它依然需要检查
+  每个磁盘块才能找到错误。在挂载系统时会执行硬盘检查的操作，这一般在计
+  算机启动时执行，因此会造成一些延迟。
+\item[ext4] \hfill \\
+  \texttt{ext4}是ext系列的新作。它以ext3为基础，加上一些关于文件系统任
+  务的一些新思想。虽然Slackware支持ext4，但我们应该记得，这个文件系统还
+  是很年轻，还在开发中。所以你对稳定性的需求大于对性能的需求，那么考虑
+  使用其它的文件系统，如ext3。虽然这么说，但ext4的确鼓吹在ext3的基础上
+  做了一些重要改进，只是人们还不信任它罢了。
+\item[reiserfs] \hfill \\
+  \texttt{reiserfs}是Linux内核支持的最古老的日志文件系统之一。它的速度
+  很快，尤其在存储、获取、写入许多小文件的情况。不幸的是，当我们遇到崩
+  溃的时候，用于从\texttt{reiserfs}恢复数据的工具很少。而
+  且\texttt{reiserfs}的分区比\texttt{ext3}更经常出问题。
+\item[XFS] \hfill \\
+  \texttt{XFS}文件系统是SGI为Linux内核贡献的一个技术，它是最好的处理大
+  容量的磁盘卷及大的文件上是文件系统之一。XFS比其它文件系统占用更多的
+  内在，但如果我们需要处理大的文件，它的高性能绝对值得我们在内存上的一
+  些牺牲。XFS不适合桌面系统或笔记本使用，但它在那些成天与大文件打交道
+  的服务器表现出众。和ext3一样，XFS也是一个日志文件系统。
+\item[JFS] \hfill \\
+  \texttt{JFS}是IBM为Linux内核做的贡献，它因在极限情况下的响应能力而闻
+  名于世。它可以作用于巨大的磁盘卷，使它们适用于做网络附加存储（全称为
+  Network Attached Storage，简称为NAS）设备。JFS历经岁月的磨炼而不见消
+  退，因此它是Linux最可靠的日志系统。
+
+\item[iso9660] \hfill \\
+  \texttt{iso9660}是一个专门为如CD或DVD这样的光学媒体而设计的文件系统。
+  因为光学盘是只读的盘，所以Linux内核根据都不支持这个系统的写操作。要
+  创建一个iso9660的文件系统，我们需要使用如\texttt{mkisofs}(8)或
+  \texttt{growisofs}(8)等工具。
+\item[vfat] \hfill \\
+  有时我们需要在Linux和Windows之间共享数据，但又不能通过网络。因此我们
+  需要通过移动硬盘或U盘来实现。而很挫的vfat文件系统却是最好的选择，因
+  为支持它的操作系统是最多的。不幸的，它是Microsoft设计的文件系统，它
+  缺少传统Linux文件系统那样的存储权限控制，这意味着要在这种系统中允许
+  多用户访问就要做些其它的工作了。
+\item[swap] \hfill \\
+  其它文件系统的作用是保存文件和目录，与之不同，\texttt{swap}分区的作
+  用是存放虚拟内存。这是十分有用的，它可以防止系统在用尽内存时崩溃。在
+  系统用尽内存时，内核会将内存中的一部分复制到\texttt{swap}分区中，这
+  样就能为其它程序腾出部分内存空间。把它想成是一个为系统增加内存的方法，
+  尽管是很慢的虚拟内在。\texttt{swap}分区是有故障保险的，也别指望用它
+  来连续工作。如果你发现自己总是用到很多的\texttt{swap}空间，那么请为
+  系统增加内存。
+\end{description}
+
 \subsection{mount和umount}
 \label{sec:filesystemStructure:mouting:mountAndUmount}
 将一个新的设备附加到文件系统的过程是很容易的，我们只要使用
