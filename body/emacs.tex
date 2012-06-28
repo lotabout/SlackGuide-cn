@@ -2,6 +2,235 @@
 \chapter{Emacs}
 \label{chap:emacs}
 
+\begin{flushleft}
+\rule{\textwidth}{0.1pt}
+\end{flushleft}
+
+\texttt{vi}显然是类Unix中存在最为广泛的编辑器，而Emacs仅次之。有一种说
+法是\texttt{vi}是编辑的神器，而\texttt{Emacs}则是神的编辑器。为什么呢？
+\texttt{vi}中是使用不同的``模式''来方便我区分文本的处理和文本的输入，
+而\texttt{Emacs}则通过使用Ctrl和Alt键的一些键绑定来达到此目的。这和现
+在我们在其它一些字处理程序中的快捷键的概念相似。（尽管如此，我们还是要
+强调，\texttt{Emacs}与这些字处理程序的快捷键不是对应的，如传统上分别用
+Ctrl+C/X/V表示复制、剪切和粘贴，而Emacs中使用的键则与此不同。）
+
+另外，\texttt{vi}就只是一个编辑器，除此之外再无其它。而\texttt{Emacs}
+则是一个无所不包的程序。由于\texttt{Emacs}（大部分）是用Lisp语言写的，
+Lisp语言是一个非常强大的语言，它还有个诡异的特性，就是所有用Lisp语言写
+的程序本身就是一个Lisp语言的编译器\footnote{Every program written in
+  it is automatically a Lisp compiler of its own.不太了解Lisp，不知道
+  这句话的含义。}。这意味着我们可以对Emacs进行扩展，实际上可以``在
+Emacs''中写全新的程序。
+
+因此，Emacs不再仅仅是一个编辑器。甚至有人说Emacs是个操作系统。网上有许
+多Emacs的插件（许多在程序源码中就自带了），为我们提供各种各样的功能。
+这些插件的很大一部分与编辑文本有关，毕竟这才是Emacs的本职工作。但不仅
+如此，例如，有一些插件是让Emacs具有表格编辑功能。还有数据库、游戏、邮
+件及新闻的客户端（最牛的当属Gnus）等等。
+
+当前有两个主流的Emacs版本：GNU Emacs（Slackware自带的即为该版本）和
+XEmacs。XEmacs最初的动机是清理Emacs代码的一个项目。当前，两个版本都发
+展良好，事实上还有试图将两者结合起来的开发小组。本章中介绍的内容对于两
+个版本都没有区别。它们的区别于普通用户无关。
+
+\section{启动Emacs}
+\label{sec:emacs:start}
+Emacs可以在命令行中启动，键入\texttt{emacs}即可启动。如果你在X环境下，
+Emacs（正常情况下）会开启自己的X窗口。启动后，Emacs首先会显示一个欢迎
+信息，几秒后会进入*scratch*缓冲区。（见第\ref{sec:emacs:buffers}节）
+
+当然，也可以在启动Emacs时就指定打开一个已经存在的文件：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\% \textbf{emacs /etc/resolv.conf}
+\end{Verbatim}
+这会使Emacs跳过欢迎信息，而载入指定的文件。
+
+\subsection{命令键}
+\label{sec:emacs:start:commandKeys}
+像之前提到的一样，Emacs使用Ctrl及Alt键和其它键的组合键来表示命令。一般
+约定分别写为C-字符及M-字符。所以C-x代表Ctrl+x，而M-x则代表Alt+x。（使
+用M而不是A的原因是Alt键最早称作Meta键。而Meta键最终在现代键盘上消失了，
+Emacs使用Alt键来替代它的功能。）
+许多Emacs命令包含多个键入键组合。例如：C-x C-c（先按下Ctrl+x，再按下
+Ctrl+c）用来退出Emacs，而C-x C-s用来保存当前文件。请记住，C-x C-b与C-x
+b代表不同的键。前一个是按下Ctrl+x后按下Ctrl+b键，而后者是先按下C-x，之
+后只按下`b'键。
+
+\section{缓冲区}
+\label{sec:emacs:buffers}
+在Emacs中，``缓冲区''的概念是很重要的。每个我们打开的文件都会被载入到
+它自己的缓冲区中。另外，Emacs还有许多特殊缓冲区，它们不包含文件而是有
+其它的作用。而这些特殊缓冲区的名字一般以星号(`*')开头，星号结尾。例如，
+Emacs启动时进入的缓冲区为*scratch*。我们可以在其中输入任意的内容，但在
+Emacs退出时，这些内容不会被保存。
+
+我们还要了解的一个特殊缓冲区就是minibuffer。该缓冲区只有一行，且总是显
+示在屏幕上：它在Emacs窗口中最下面的那行，在当前缓冲的状态栏下面。
+minibuffer是Emacs用来为用户显示信息的，并且，当一个命令需要额外输入时，
+也是在minibuffer中输入的。例如，我们用C-x C-f命令打开一个新文件，Emacs
+会要求我们在minibuffer中输入要打开的文件名。
+
+从一个缓冲区切换到另一个缓冲区使用命令C-x b。它会在minibuffer上提示当
+前的所有缓冲区的名字（一般缓冲的名字就是当前编辑的文件名），它会给出一
+个默认缓冲区，通常就是最近编辑过的缓冲。选定后按回车即可。
+
+如果我们想切换的缓冲不是默认的，那么我们就要手工输入要切换到的缓冲区的
+名字。这里别忘了我们提到过的TAB补全：只要输入开始的几个字符，按下TAB，
+Emacs就会尽可能地为我们补全。Emacs的一些其它有意义的地方也能使用补全。
+
+我们可以通过键入C-x C-b来得到当前打开缓冲的一个列表。这个命令通常会将
+屏幕分成两半，在上半部分显示我们工作的缓冲区，而下半部分则是名为
+*Buffer List*的缓冲区。这个缓冲区中包含了当前打开的缓冲区列表，对应的
+大小、模式以及缓冲查看的文件。我们可以按下C-x 1来关闭它。
+
+\begin{quote}
+  \textbf{注意：}如果在X环境下，Emacs的菜单中也有当前所有打开缓冲区的
+  列表。
+\end{quote}
+
+\section{模式}
+\label{sec:emacs:modes}
+每个Emacs的缓冲区都有对应的模式。这里的模式与\texttt{vi}中的模式有着天
+壤之别：Emacs中的模式是告诉我们我们处在什么样的缓冲区中。例如，对于普
+通的文本文件，我们有文本模式（text-mode），但还有其它的模式，如C模式
+（c-mode）用于编辑C程序，sh模式（sh-mode）用于编辑shell脚本。而latex模
+式（latex-mode）则用于编辑\LaTeX{}文件，而mail模式（mail-mode）用于编
+辑邮件及新闻信息，等等。每个模式都为我们作了特殊的定制，以用来编辑特殊
+的文本。我们还可以为一个模式定义它特有的键及键命令。例如，在文本模式
+(text-mode)下，TAB键是用来跳到下个制表符，但在许多编程语言的模式下，
+TAB键就被定义为根据当前代码的位置进行缩进。
+
+我们之前提到的模式称为主模式（major mode）。每个缓冲区只在处于一个主模
+式下，但可以有一个或多个副模式（minor mode），副模式为我们提供了一些额
+外的编辑功能。例如，如果我们按下``Esc''键，我们就会调用覆盖模式
+（overwrite-mode），这是你想不到的吧。还有一个叫auto-fill-mode，它
+和text-mode及latex-mode结合起来很方便：当我们在一行中输入字符到一定个数，
+它会自动跳到下一行。如果没有auto-fill-mode，我们要手工调
+用\texttt{M-q}来对一个段落进行重排。
+
+\section{打开文件}
+\label{sec:emacs:openFiles}
+要在Emacs中打开一个文件，键入：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{C-x C-f}
+\end{Verbatim}
+Emacs会提示我们输入要打开的文件的文件名，还会填入一些默认的路径（通常
+是\path{\~/}）。输入文件名后（可以使用补全）输入回车，Emacs会在一个新的
+缓冲区中打开文件，并在屏幕上显示该缓冲区。
+\begin{quote}
+  \textbf{注意：}Emacs会自动创建一个新的缓冲区，而不会将文件载入到当前
+  缓冲中。
+\end{quote}
+
+要在Emacs中创建一个新的文件，并不能像在\texttt{vi}中可以直接输入内容，
+最后再保存为文件，相反的，我们必须先为该文件创建一个缓冲区，并为其命名。
+我们可以按下C-x C-f，并输入我们想创建的文件的名字，就像在打开一个已经
+存在的文件一样。Emacs会发现我们的文件不存在，并为它创建一个新的缓冲，
+在minibuffer中显示``(New file)''信息。
+
+如果我们在键入C-x C-f之后输入的是一个目录名而不是文件名，则Emacs会创建
+一个新的缓冲区，其中包括了该目录下所有文件的一张列表。我们可以将光标移
+动到想打开的文件上，输入回车，则Emacs就会打开它。（当然，这里还可以执
+行很多其它的操作，如删除文件、重命名、移动文件等等。这是Emacs的
+dired-mode，简单地说就是一个文件管理器。）
+
+如果你按了C-x C-f，突然又不想打开文件了，可以按下C-g来取消这个动作。在
+Emacs中，几乎可以在任何地方使用C-g来取消当前的动作。
+
+\section{基本编辑命令}
+\label{sec:emacs:basicEditing}
+我们打开文件后，想做的当然是移动光标。方向键、鼠标及PageUp、PageDown键
+和正常情况的行为一致。Home和End键分别跳转到当前行的行首和行尾。（老版
+本中的作用是跳到缓冲区开头和缓冲区末尾。），但我们还有一些Ctrl和
+Meta(Alt)的组合键可以完成相同的功能。因为我们在输入时是不会想把手移到键
+盘的另一边的。也正是因为我们不必移动我们的手，使用这些键的效率往往更高。
+最重要的一些命令已经在表\ref{tab:basic-emacs-editing}列出了。
+
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{c|l}
+    \hline\hline
+    命令 & 作用 \\ \hline
+    C-b & 移动到后一个字符的位置（后，指朝文件开始的方向）\\
+    C-f & 移动到前一个字符的位置（前，指朝文件末尾的方向） \\
+    C-n & 向下移动一行 \\
+    C-p & 向上移动一行 \\
+    C-a & 移动到当前行行首\\
+    C-e & 移动到当前行行末 \\
+    M-b & 向后移动一个词\\
+    M-f & 向前移动一个词\\
+    M-\} & 向前移动一个段落\\
+    M-\{ & 向后移动一个段落 \\
+    M-a & 移动到当前句子的开头\\
+    M-e & 移动到当前句子的末尾\\
+    C-d & 删除当前光标所在位置的字符\\
+    M-d & 删除到当前单词的末尾\\
+    C-v & 向下滚动一屏（即PageDown）\\
+    M-v & 向上滚动一屏（即PageUp）\\
+    M-$<$ & 移动到当前缓冲区的起始位置 \\
+    M-$>$ & 移动到当前缓冲区的结束位置\\
+    C-\_ & 撤消最后一次发动（可重复执行）\\
+    C-k & 删除直到当前行末的所有字符\\
+    C-s & 向前搜索\\
+    C-r & 向后搜索\\
+    \hline\hline
+  \end{tabular}
+  \caption{Emacs基本编辑命令}
+  \label{tab:basic-emacs-editing}
+\end{table}
+
+注意，一般而言Meta的组合键的功能与Ctrl的组合键类似，只是使用的单位更大
+一些：如C-f的作用是向前移动一个字符，而M-f则是向前移动一个单词，以此类
+推。
+
+另外，如M-$<$和M-$>$这类的组合键分别要求我们同时按下Shif+Alt+逗号及
+Shift+Alt+点号。这是由于$<$及$>$分别需要由Shift+逗号键及Shift+点号键才能输
+出。（当然，除非你的键盘不是标准美式键盘。）
+
+还要注意的是C-k会删除（Emacs中称为kill）光标后到行末的所有文本。但不删
+除换行符本身。如果当前光标后没有其它字符了，它才会删除换行符。也就是如
+果想删除一整个行，则要按两下C-k：第一下用于删除多余的文本，第二下删除
+换行符本身。
+
+\section{保存文件}
+\label{sec:emacs:savingFiles}
+要保存一个文件，按键如下：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{C-x C-s}
+\end{Verbatim}
+Emacs不会询问要保存的文件名，它会保存当时打开的那个文件中。如果你想
+``另存为''，可以按如下键：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{C-x C-w}
+\end{Verbatim}
+
+在本会话第一次保存文件时，Emacs会将旧的文件保存为一个备份，备份文件名
+与原文件相同，只是在文件名之后加上\texttt{\~}符：例如，如果编辑的是
+``\path{cars.txt}''文件，则备份文件名为``\path{cars.txt~}''
+
+备份文件是我们打开文件的一个复本。而在我们工作时，Emacs还会为我们创建
+一个自动保存的复本，该复本文件名形式如下：\texttt{\#cars.txt\#}。在我们
+执行C-x C-s后，Emacs会删除该复本。
+
+当我们编辑结束后，可以使用下面的命令来关闭(kill)一个缓冲区：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{C-x k}
+\end{Verbatim}
+
+Emacs会询问我们要关闭哪个缓冲区，默认为当前缓冲，输入回车确认。如果我
+们还没有保存，则Emacs会提示我们是否真的希望关闭该缓冲区。
+
+\section{启动Emacs}
+\label{sec:emacs:quit}
+我们结束编辑任务后，可以按下面的键
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{C-x C-c}
+\end{Verbatim}
+来退出Emacs。如果我们有未保存的文件，Emacs会提示我们，并逐个询问我们是
+否保存。如果有任意一个回答no，则Emacs会最后询问一次是否退出，之后退出。
+
+
+
 
 %%% Local Variables: 
 %%% mode: latex

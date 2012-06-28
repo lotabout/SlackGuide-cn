@@ -1,8 +1,357 @@
-
 \chapter{VI}
 \label{chap:vi}
 
+\begin{flushleft}
+\rule{\textwidth}{0.1pt}
+\end{flushleft}
 
+\texttt{vi}(1)是标准的Unix编辑器，尽管现在掌握它已经不如当年来得重要了，
+但掌握\texttt{vi}曾经是，现在也是一个回报丰厚的目标。现在有许多
+\texttt{vi}的版本（或称为克隆），包括\texttt{vi}、\texttt{elvis}、
+\texttt{vile}及\texttt{vim}。任何的Unix版本中都至少包含它们中的一个，
+当然，Linux亦是如此。所有这些\texttt{vi}克隆都有着一些共同的基本功能及
+命令，所以只在学习其中的一种就能让我们同时掌握其它的。由于现在的Linux
+版本以及Unix变种都包含了许多其它的文本编辑器，许多人已经不再使用
+\texttt{vi}了，但它仍然是所有Unix及类Unix系统中最广泛存在的编辑器。掌
+握\texttt{vi}意味着一旦坐在一台Unix机器前，我们至少不会对编辑器感到陌
+生。
+
+\texttt{vi}包含了许多强大的功能，包括语法高亮、代码重排、强大的搜索替
+换机制、宏及其它一些功能。这些功能对于程序员、网页开发人员及类似工作的
+人们吸引力尤大。而一些系统管理员甚至希望让\texttt{vi}与shell整合进行工
+作。
+
+在Slackware Linux中，默认的\texttt{vi}版本是\texttt{elvis}，但同时还包
+括了\texttt{vim}和\texttt{gvim}，当然，前提是你安装了相关的包。而
+\texttt{gvim}则是在X环境下的\texttt{vim}版本，它包含了工具栏、可分享的
+菜单及对话框等等。
+
+学习\texttt{vi}最好的方法当然就是练习，但教程也是极为重要的，幸运的是，
+\texttt{vi}自身就包含了良好的文档，可以在\texttt{vi}中通过
+\texttt{:help}打开。而这些文档也在良好的中文翻译。请查阅相关的内容。笔
+者还向你推荐O'reilly出版社的《学习VI和VIM编辑器》一书。本章中只对
+\texttt{vi}的基本功能进行描述。
+
+\section{启动vi}
+\label{sec:vi:start}
+\texttt{vi}可以通过许多方式从命令行中启动。最简单的方式就是：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\% \textbf{vi}
+\end{Verbatim}
+\begin{figure}[ht]
+  \centering
+  \begin{Verbatim}[frame=single,commandchars=\\\{\}]
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+                                                             Command
+\end{Verbatim}
+
+  \caption{VI启动界面}
+  \label{fig:vi-start}
+\end{figure}
+这个命令会启动\texttt{vi}，并开启一个空的缓冲区，如图
+\ref{fig:vi-start}所示。现在你可能就开始输入了，并且期望我们的输入能立
+即反应到屏幕上。但这时候发现，事实并非如此，屏幕可能连反应都没有，也可
+能出现乱七八糟的字符。原因很简单，\texttt{vi}是``有模式''的编辑器，而
+你现在正处于它的``命令模式''下。\texttt{vi}有两个模式：``命令模式''和
+``插入模式''。命令模式是默认的模式，在命令模式中，我们在键盘上敲的所有
+键都会被\texttt{vi}解释为一个命令，这些命令的含义可以是移动光标、删除
+字符、复制粘贴，搜索等等。而在插入模式，所有我们敲的字符都会直接反应在
+屏幕上，这个模式与我们传统的习惯相同。关于模式的详细讨论请见第
+\ref{sec:vi:modes}节。
+
+要退出\texttt{vi}，只要在\texttt{vi}中输入下列键：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{:q}
+\end{Verbatim}
+假设我们没有对文件进行任何改动，则\texttt{vi}正常退出。如果做了一些改
+动，则\texttt{vi}会发出警告，告诉我们有未保存的修改，并告诉我们如果想
+放弃修改应该怎么做。而放弃修改一般意味着我们要对退出命令作些解释，在
+``q''之后加上``!''即表示丢弃所有未保存的修改而直接退出：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{:q!}
+\end{Verbatim}
+`!'一般意味着强制执行一些动作。我们会在之后解释键组合时进一步说明。
+
+我们也可以在启动\texttt{vi}时同时指定打开某个文件。例如，我们可以在启
+动\texttt{vi}时同时打开文件\path{/etc/resolv.conf}：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\% \textbf{vi /etc/resolv.conf}
+\end{Verbatim}
+
+最后，\texttt{vi}可以在启动时就跳到一个文件的某个特定行。这对于程序员
+在调试时知道某行出错而进行修改时很有用。例如，我们可以启动\texttt{vi}，
+并打开\path{/usr/src/linux/init/main.c}，并跳到第47行，如下：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\% \textbf{vi +47 /usr/src/linux/init/main.c}
+\end{Verbatim}
+\texttt{vi}会打开该文件并将光标放在指定的行上。而如果指定的行大于文件
+的行数，则\texttt{vi}会将光标放在文件的最后一行。这对于程序员来说极为
+有用，这意味着他们可以不用搜索就跳转到指定的行。
+
+
+\section{模式}
+\label{sec:vi:modes}
+模式就像金箍棒，用不惯的人觉得是废物，用惯的人就知道是神器。
+\texttt{vi}有许多模式，用于完成各种任务。从现在开始，我们就可以学习如
+何处理文本、在文件中移动、保存、退出以及变换切换模式。编辑文本则是在插
+入模式下完成的。我们可以使用很多个键来在模式中切换，下面就要讲到：
+
+\subsection{命令模式}
+\label{sec:vi:modes:command}
+我们默认进入的就是命令模式。在本模式下，我们不能直接键入文本或是对已有
+文本直接修改。然而，在此模式下，我们可以处理文本、搜索、退出、保存、载
+入新文件及其它的一些工作。本节中只对命令模式本身进行介绍，具体的命令请
+参见第\ref{sec:vi:keys}节。
+
+也许在命令模式下最常用的命令就是用来切换到插入模式。这可以通过按下
+\texttt{i}键完成。进入插入模式后，光标的形状发生了改变，在屏幕下方会出
+现\texttt{--INSERT--}字样（注意，\texttt{vi}的各版本行为不尽相同，如
+\texttt{elvis}会在下方显示\texttt{Input}字样）。现在，我们按下的所有键，
+都会直接输入当前的缓冲区中，显示在屏幕上。如果想回到命令模式，请按下
+\texttt{Esc}键。
+
+要想在文件中进行移动，也是在命令模式下完成的。一些系统中，我们是使用方
+向键进行移动的，\texttt{vi}中也保留了这个设定，但在另一些系统中，我们
+需要使用更古老的``hjkl''键进行移动。下面是这些命令的简单介绍：
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{c|l}
+  \hline\hline
+  h & 向左移动一个字符 \\
+  j & 向下移动一个字符 \\
+  k & 向上移动一个字符 \\
+  l & 向右移动一个字符 \\ 
+  \hline\hline
+\end{tabular}
+\end{table}
+在命令模式下按下相应的键就可以在文本中进行移动。我们之后会看到，这些键
+能加上数字作为参数，因此移动起来更有效率。
+
+我们在命令模式下看到的许多命令是带冒号（`:'）的。例如之前用过的
+\texttt{:q}。冒号意味着这是一个命令，而后面则是命令的本尊，如
+\texttt{q}就是告诉\texttt{vi}退出的命令。另外一些命令是一些可选的数字，
+之后跟上一个字符。这些命令之前没有冒号，且一般用于处理文本。
+
+例如，在文件中删除一行是通过\texttt{dd}完成的。它会删除当前光标所在的
+行，而使用\texttt{4dd}这个命令则告诉\texttt{vi}从当前光标开始，向下删
+除4行。一般来说，数字是告诉\texttt{vi}执行相同的命令多少次数。
+
+我们也可以在移动的按键前加上数字，如\texttt{10k}表示向下移动10行。
+
+命令模式也可以用来复制粘贴、输入文本及将其它文件的内容读入当前缓冲区。
+复制是通过\texttt{y}键来实现的（y表示yank）。而复制当前的行则是按下
+\texttt{yy}键完成的，当然，同前面一样，可以在这些键前加上数字来指定一
+次复制多少行。复制之后，在要粘贴的位置按下\texttt{p}键，则复制的内容复
+制到当前光标之后。
+
+剪切的功能是通过\texttt{dd}完成的，剪切后使用\texttt{p}键就能将剪切的
+内容粘贴到指定位置。而读取另一个文件也很简单，只要输入\texttt{:r
+  filename}就可以在当前行的下一行插入\texttt{filename}文件的内容。更高
+端的\texttt{vi}克隆还有补全功能，像shell一样。
+
+最后要介绍的是查找。命令模式即支持简单的查找，也支持异常复杂的查找替换
+功能，这些功能要使用加强版的正则表达式。由于完整介绍正则表达式已经超出
+本书的范围，所以这里只介绍最简单的查找。
+
+要执行简单的查找，先按下\texttt{/}键，之后输入要查找的内容。
+\texttt{vi}会从当前光标搜索至文件末尾，直到找到一个匹配为止。注意，不
+完全匹配也会让\texttt{vi}停下。例如，我们要查找``the''，但\texttt{vi}
+在找到``then''、``therefore''时也会停下。这是因为这两个词也匹配了``the''。
+
+在\texttt{vi}找到第一个匹配后，我们可以输入\texttt{/}并按回车来查找下
+一个匹配，但更方便的是按\texttt{n}键，代表下一个匹配。我们还可以使用
+\texttt{?}代替\texttt{/}来执行反向搜索，即从当前光标向文件头搜索。
+
+\subsection{插入模式}
+\label{sec:vi:modes:insert}
+插入、替换文本是在插入模式完成的。正如之前讨论的，可以在命令模式下输入
+\texttt{i}键切换到插入模式。之后，所有输入的内容都会直接输入到当前缓冲
+区中。而按下\texttt{Esc}键则会回到命令模式。
+
+替换文本有好几种方法。在命令模式下，我们可以输入\texttt{r}，它允许我们
+替换当前光标下的一个字符，之后又直接回到命令模式。而键入\texttt{R}则允
+许我们替换任意字符。要退出``替换模式''，键入\texttt{Esc}即可。
+
+还有一种可以在输入和替换间切换，按下键盘上的\texttt{Ins}键，会直接从命
+令模式进入插入模式，而进入插入模式后，它的作用就成了在插入与替换间的切
+换。按一下就进入替换模式，再按一下又回到插入模式。
+
+\section{打开文件}
+\label{sec:vi:open}
+\texttt{vi}允许我们从命令模式下打开一个文件，也允许我们直接在命令行启
+动时指定，这在前面介绍过了。命令模式下，要打开\path{/etc/lilo.conf}文
+件：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{:e /etc/lilo.conf}
+\end{Verbatim}
+如果我们对当前的缓冲做了修改但还没有保存，则\texttt{vi}会提示尚未保存，
+并阻止新文件的打开。当然，我们还是可以通过输入\texttt{:e!}命令来强制打
+开新文件，并且不保存当前缓冲的修改。一般，可以使用叹号（`!'）来忽略
+\texttt{vi}的警告，强制执行某些命令。
+
+如果你想重新载入当前文件，那么可以直接输入\texttt{e!}，如果我们把文件
+改乱了，那么这是非常有用的命令。
+
+而一些\texttt{vi}克隆（如\texttt{vim}）允许我们同时打开多个缓冲。例如，
+我们在当前打开文件的情况下，想打开主目录下的\texttt{09-vi.sgml}文件，那
+么我们可以输入：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{:split ~/09-vi.sgml}
+\end{Verbatim}
+
+这时屏幕会分成上下两部分，而新打开的文件会显示在上半部分，原先的文件则
+在下半部分。而这些命令可以认为是模仿\texttt{Emacs}的开始。当然，了解这
+些命令的最好方法是查看这些\texttt{vi}克隆的帮助文件。当然，还有许多克
+隆不支持分屏，所以可能连用都不能用。
+
+\section{保存文件}
+\label{sec:vi:save}
+在\texttt{vi}中保存文件有许多方法。如，我们想将当前的缓冲区保存为
+\texttt{randomness}，我们可以在命令模式下输入：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{:w randomness}
+\end{Verbatim}
+
+一旦我们保存过一次，下次保存时就不需要再输入文件名了，只要输入
+\texttt{:w}就可以了，期间对文件进行的修改都会保存到文件中。如果我们想
+保存文件并退出（很经常的操作），我们可以输入\texttt{:wq}，这告诉
+\texttt{vi}，先保存当前文件，之后退出到shell中。
+
+有时，我们想将修改保存到只读文件中，我们就必须在保存命令后加上叹号，如：
+\begin{Verbatim}[frame=single,commandchars=\\\{\}]
+\textbf{:w!}
+\end{Verbatim}
+
+当然，有时这个命令还是无效（如：我们想修改一个别人拥有的文件）。如果我
+们强烈地想修改那个文件，那么可以以\texttt{root}用户或文件的属主（推荐）
+登陆对文件进行修改。
+
+\section{退出vi}
+\label{sec:vi:quit}
+退出\texttt{vi}的一个方法是\texttt{:wq}，我们就可以在退出前保存当前缓
+冲。我们也可以不保存就退出\texttt{:q}或（更常见的）\texttt{:q!}。后面
+这个命令用于我们做了修改但不想保存的情况。
+
+有一些情况下，我们的机器崩溃或\texttt{vi}崩溃了。这时\texttt{elvis}和
+\texttt{vim}都做了一些工作来将损失减到最小。这两个编辑器都会打开的缓冲
+保存为一个临时文件，该文件的文件名与原文件相似，只是以点号（`.'）开头，
+所以它是个隐藏文件。
+
+这个临时文件在编辑器正常退出后会删除，这意味着如果编辑器崩溃时，这些文
+件仍存在，那么如果我们在崩溃后再次编辑原来的文件，编辑器会提示我们应该
+怎么做。多数情况下，我们可以恢复很大一部分的工作。\texttt{elvis}还会给
+你发封邮件告诉你它有一份当前备份。
+
+\section{vi配置}
+\label{sec:vi:configuration}
+\texttt{vi}可以通过多种方式进行配置。
+
+我们可以根据自己的喜好在启动\texttt{vi}后输入一堆配置命令。根据我们使
+用的\texttt{vi}克隆，我们可以作些设置来方便编程（如语法高亮、自动缩进
+等等），还可以编写宏来自动完成一些任务，启用文本替换等等。
+
+几乎所有这些设置命令都可以放入主目录下的一个配置文件中。\texttt{elvis}
+使用的配置文件为\texttt{.exrc}，而\texttt{vim}则使用\texttt{.vimrc}文
+件。绝大多数配置命令都可以放在配置文件中，包括安装信息、文本替换、宏等
+等。
+
+由于不同的编辑器选项不同，在这里要讨论所有的选项不太现实，这方面的内容
+请参考你喜欢的编辑器的man手册、官网、帮助文件等等。一些编辑器（如
+\texttt{vim}及\texttt{elvis}）自带了帮助系统，通过输入命令
+\texttt{:help}就可以调用。当然《学习VI和VIM编辑器》一书也是很好的参考。
+
+Linux中的许多软件内部会默认使用\texttt{vi}来编辑文件。例如，编辑
+crontabs会默认使用\texttt{vi}，如果你不喜欢\texttt{vi}，而想用其它的编
+辑器，可以将\texttt{VISUAL}环境变量设置成你喜欢的编辑器。如果你希望每
+次登陆后使用的默认编辑器都一致，那么将对\texttt{VISUAL}的设置加入
+\path{.bash_profile}或\path{.bashrc}文件中。
+
+\section{vi键绑定}
+\label{sec:vi:keys}
+本节是许多常用\texttt{vi}命令的快速参考，有些命令之前介绍了，有些则是
+新的。
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{c|l}
+  \hline\hline
+  键 & 操作 \\ \hline
+  h,j,k,l & 向左、下、上、右移动一个字符 \\
+  \$ & 移动到行末 \\
+  $\wedge$ & 移动到行首 \\
+  G & 移动到文件末尾 \\
+  :1 & 移动到文件开头 \\
+  :47 & 移动到第47行 \\
+  \hline\hline
+\end{tabular}
+
+  \caption{VI——移动命令}
+  \label{tab:vi-movement}
+\end{table}
+
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{c|l}
+    \hline \hline
+    键 & 操作 \\ \hline
+    dd & 删除一行 \\
+    5dd & 删除5行 \\
+    r & 替换当前光标下的一个字符 \\
+    x & 删除一个字符 \\
+    10x & 删除10个字符 \\
+    u & 撤消最后一次更改 \\
+    J & 连接当前行和下一行 \\
+    \%s/old/new/g & 将全文中所有的old替换为new \\
+    \hline \hline
+  \end{tabular}
+  \caption{VI——编辑命令}
+  \label{tab:vi-edit}
+\end{table}
+
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{c|l}
+    \hline \hline
+    键 & 操作 \\ \hline
+    /asdf & 搜索asdf \\
+    ?asdf & 反向搜索asdf \\
+    / & 向前重复最后一次搜索 \\
+    ? & 反向重复最后一次搜索 \\
+    n & 重复最后一次搜索，方向也相同 \\
+    N & 重复最后一次搜索，方向相反 \\
+    \hline\hline
+  \end{tabular}
+  \caption{VI——搜索命令}
+  \label{tab:vi-search}
+\end{table}
+
+\begin{table}[htpb]
+  \centering
+  \begin{tabular}{c|l}
+    \hline \hline
+    键 & 操作 \\ \hline
+    :q & 退出 \\
+    :q! & 不保存就退出 \\
+    :wq & 保存并退出 \\
+    :w & 保存当前修改 \\
+    :e! & 放弃未保存的所有修改 \\
+    :w hejaz & 将当前缓冲保存为jejaz文件 \\
+    :r asdf & 读取asdf文件的内容插入当前缓冲 \\
+    :r !ls & 读取ls命令的输入插入当前缓冲 \\
+    \hline \hline
+  \end{tabular}
+  \caption{VI——保存及退出}
+  \label{tab:vi-saveAndQuit}
+\end{table}
 %%% Local Variables: 
 %%% mode: latex
 %%% TeX-master: "../SlackGuide"

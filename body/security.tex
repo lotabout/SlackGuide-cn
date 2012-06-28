@@ -12,14 +12,14 @@
 过程而不是一个状态。
 
 \section{关闭服务}
-\label{chap:security:disablingServices}
+\label{sec:security:disablingServices}
 安装完Slackware后的第一件事应该是关闭那些你不需要的服务。还记得这个说
 法吗？服务越多则安全性越低。每个服务都可能增加安全隐患，所以我们要尽可
 能少开启服务（即只开启我们需要的服务）。服务主要从两个地方开
 启——\texttt{inetd}及启动脚本。
 
 \subsection{inetd开启的服务}
-\label{chap:security:disablingServices:inetd}
+\label{sec:security:disablingServices:inetd}
 Slackware的许多守护进程都是由\texttt{inetd}(8)开启的。\texttt{inetd}本
 身就是一个守护进程，有许多服务被设置为由\texttt{inetd}启动，而
 \texttt{inetd}就负责监听这些服务用到的端口，当接收到一个连接请求时，
@@ -44,7 +44,7 @@ telnet stream tcp nowait root /usr/sbin/tcpd in.telnetd
 \end{Verbatim}
 
 \subsection{启动脚本开启的服务}
-\label{chap:security:disablingServices:init}
+\label{sec:security:disablingServices:init}
 剩下的一些服务是由\path{/etc/rc.d/}目录下的启动脚本开启的。这些服务可
 以通过两种方法禁用。第一种是去除相应脚本的可执行权限，第二种则是在初始
 化脚本中注释掉对应的行。
@@ -88,10 +88,10 @@ fi
 
 
 \section{主机访问控制}
-\label{chap:security:hostAccessControl}
+\label{sec:security:hostAccessControl}
 
 \subsection{iptables}
-\label{chap:security:hostAccessControl:iptables}
+\label{sec:security:hostAccessControl:iptables}
 \texttt{iptables}是2.4及以上版本的内核中的包过滤配置程序。Slackware第
 一个使用2.4内核（准确的说是2.4.5）的版本是8.0，而在Slackware 8.1中默认
 使用它。本书中只对它的基本用法进行介绍，全面的介绍请参考
@@ -164,7 +164,8 @@ fi
 HOWTO\footnote{\url{http://www.netfilter.org/documentation/HOWTO/NAT-HOWTO.txt}}
 
 \subsection{tcpwrappers}
-\label{chap:security:hostAccessControl:tcpwrappers}
+\label{sec:security:hostAccessControl:tcpwrappers}
+
 \texttt{tcpwrapper}是在软件层执行访问控制而非IP层。当IP层的访问控制
 （即Netfilter）出现异常时，它可以提供额外的保护层。例如，如果你重新编
 译了内核，忘了开启iptables支持，则IP层的访问控制就会失效，这时候
@@ -204,10 +205,10 @@ sshd : .slackware.com
 \end{Verbatim}
 
 \section{保持最新状态}
-\label{chap:security:keepingCurrent}
+\label{sec:security:keepingCurrent}
 
 \subsection{slackware-security邮件列表}
-\label{chap:security:keepingCurrent:mailingList}
+\label{sec:security:keepingCurrent:mailingList}
 当某个安全问题影响到Slacwkare时，Slackware官方会对所有订阅了
 \url{slackware-security@slackware.com}邮件列表的用户发送一封邮件。而除
 了在\path{/extra}和\path{/pasture}中的软件，Slackware中其它软件的报告
@@ -217,7 +218,7 @@ sshd : .slackware.com
 如何订阅这些邮件已经在第\ref{sec:help:onlineHelp:mailingLists}节中介绍过了。
 
 \subsection{/pasture目录}
-\label{chap:security:keepingCurrent:pasture}
+\label{sec:security:keepingCurrent:pasture}
 当一个更新后的软件包在一个新的Slackware版本发行的时候（如果它已经包含在
 Slackware之前的版本中，那么通常意味着新的版本只是修复了某些安全问题），
 那么Slackware会把它放在\path{/pastures}目录。具体的目录根据你用的镜像

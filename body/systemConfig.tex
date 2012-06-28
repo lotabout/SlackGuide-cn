@@ -153,7 +153,7 @@ bash: /bin/bash /usr/bin/bash /usr/man/man1/bash.1.gz
 
 
 \subsubsection{slocate}
-\label{sec:systemConfig:systemOverview:findingFiles:find}
+\label{sec:systemConfig:systemOverview:findingFiles:slocate}
 和\texttt{find}一样，\texttt{slocate\textbf{(1)}}也是对整个文件系统进
 行搜索，但它搜索的并不是真正的文件系统，而是一个事先生成的数据库。该数
 据库默认在每天凌晨时自动更新。但对于一些个人用户，凌晨时电脑一般处于关
@@ -242,7 +242,7 @@ tradition, we'll lump everything else into another category.)
 \end{description}
 
 \subsubsection{网络初始化}
-\label{sec:systemConfig:systemOverview:etcRcd:runlevelInit}
+\label{sec:systemConfig:systemOverview:etcRcd:networkInit}
 
 运行级别为2、3或4时都会开启网络支持。下面这些文件就是用于网络的初始化
 的：
