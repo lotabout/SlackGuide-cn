@@ -1,4 +1,3 @@
-
 \chapter{Slackware包管理}
 \label{chap:packageManagement}
 \begin{flushleft}
@@ -202,8 +201,7 @@ postinstall\footnote{不知道怎么翻译这个词}脚本则会被移动到
 \section{制作软件包}
 \label{sec:packageManagement:makingPackages}
 制作Slackware的软件包说难则难，说简单也简单。首先，没有一个标准的制作
-包的方法。唯一的要求是最后要是一个用tar打包、gzip压缩（现在鼓励使用xz）
-的文件，如果还有postinstallation脚本的话，就只能是
+包的方法，唯一的必要要求是最后文档一定要用tar打包并且用gzip或者现在鼓励使用的xz压缩，如果还有postinstallation脚本的话，就只能是
 \path{/install/doinst.sh}。
 
 如果你对制作软件包感兴趣，那么我们建议你看看Slackware源码树中的创建脚
